@@ -13,8 +13,8 @@
 
     <node pkg="ros_gz_sim" exec="create" name="create_turtle" output="screen">
         <param name="topic" value="/robot_description"/>
-        <param name="x" value="-7.0"/>
-        <param name="y" value="5.0"/>
+        <param name="x" value="-4.5"/>
+        <param name="y" value="-4.5"/>
         <param name="z" value="1.0"/>
         <param name="R" value="0.0"/>
         <param name="P" value="0.0"/>

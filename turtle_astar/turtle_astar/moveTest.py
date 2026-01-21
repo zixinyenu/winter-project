@@ -28,7 +28,7 @@ class moveTest(Node):
         self._is_turning = False
         self._turn_sign = 1
         self._turn_counter = 0
-        self._x_vel = 5.0
+        self._x_vel = 0.5
 
         # Publishers
         self.twist_publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
