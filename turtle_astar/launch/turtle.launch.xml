@@ -18,7 +18,7 @@
         <param name="z" value="1.0"/>
         <param name="R" value="0.0"/>
         <param name="P" value="0.0"/>
-        <param name="Y" value="1.57079"/>
+        <param name="Y" value="0.0"/>
     </node>
 
     <node pkg="ros_gz_bridge" exec="parameter_bridge" args="

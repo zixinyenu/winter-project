@@ -2,6 +2,10 @@
 
 <gazebo>
     <plugin name="gz::sim::systems::DiffDrive" filename="gz-sim-diff-drive-system">
+        <left_joint>wheel_left_joint</left_joint>
+        <right_joint>wheel_right_joint</right_joint>
+        <wheel_separation>0.16</wheel_separation>
+        <wheel_radius>0.033</wheel_radius>
         <topic>/cmd_vel</topic>
         <odom_topic>/odom</odom_topic>
     </plugin>
