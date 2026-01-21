@@ -34,10 +34,9 @@ setup(
         ('share/' + package_name, ['config/turtle_rviz.rviz']),
         ('share/' + package_name, ['worlds/turtle.world.sdf']),
         ('share/' + package_name, ['urdf/turtlebot3_burger.urdf.xacro']),
+        ('share/' + package_name, ['urdf/turtlebot3_burger.gazebo.xacro']),
         ('share/' + package_name, ['launch/turtle_rviz.launch.xml']),
-        *recursive_files('share/' + package_name, 'models'),
-        *recursive_files('share/' + package_name, 'worlds'),
-        *recursive_files('share/' + package_name, 'launch'),
+        ('share/' + package_name, ['launch/turtle.launch.xml']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -52,6 +51,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'moveTest = turtle_astar.moveTest:main'
         ],
     },
 )

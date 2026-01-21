@@ -1,0 +1,12 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="turtlebot3_burger">
+
+<gazebo>
+    <plugin name="gz::sim::systems::DiffDrive" filename="gz-sim-diff-drive-system">
+        <topic>/cmd_vel</topic>
+        <odom_topic>/odom</odom_topic>
+    </plugin>
+
+    <plugin name="gz::sim::systems::JointStatePublisher" filename="gz-sim-joint-state-publisher-system"/>
+</gazebo>
+
+</robot>
