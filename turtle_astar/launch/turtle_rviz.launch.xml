@@ -1,0 +1,14 @@
+<launch>
+
+    <arg name="is_using_gazebo" default="true" />
+    <arg name="view_only" default="true" />
+
+    <node pkg="robot_state_publisher" exec="robot_state_publisher">
+        <param name="robot_description" value="$(command '$(exec-in-pkg xacro xacro) $(find-pkg-share turtle_astar)/turtlebot3_burger.urdf.xacro gazebo:=$(var is_using_gazebo)')" />
+    </node>
+
+    <node pkg="joint_state_publisher" exec="joint_state_publisher" if="$(eval '\'$(var view_only)\'==\'true\'')"/>
+
+    <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share turtle_astar)/turtle_rviz.rviz"/>
+
+</launch>
