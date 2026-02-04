@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from .Astar import *
 
-def run_astar(start, goal):
+def run_astar(start, goal, online=False):
     start_x = start[0]
     start_y = start[1]
     goal_x = goal[0]
     goal_y = goal[1]
 
     solution_path = a_star(
-        (start_x, start_y), (goal_x, goal_y), online=False
+        (start_x, start_y), (goal_x, goal_y), online
     )
 
     xlist = []

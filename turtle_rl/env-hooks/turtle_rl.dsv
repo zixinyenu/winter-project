@@ -1,0 +1,2 @@
+prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;share/turtle_rl/models
+prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;share/turtle_rl/worlds

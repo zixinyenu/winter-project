@@ -23,8 +23,8 @@ class turtleControl(Node):
         # Private Variables
         self._cmd_fre = self.get_parameter('cmd_fre').value
         self._start_pst = [1.0, 1.0]
-        self._goal_pst = [4.0, 3.0]
-        self._xlist, self._ylist = run_astar(self._start_pst, self._goal_pst)
+        self._goal_pst = [3.0, 3.0]
+        self._xlist, self._ylist = run_astar(self._start_pst, self._goal_pst, online=False)
         self._waypoint_count = 0
 
         self._curr_pst = self._start_pst

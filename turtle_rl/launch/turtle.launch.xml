@@ -1,0 +1,33 @@
+<launch>
+
+    <arg name="world" default="$(find-pkg-share turtle_rl)/turtle.world.sdf" description="World sdf file path." />
+    <arg name="view_only" default="false" description="True to view Rviz, default as false" />
+
+    <include file="$(find-pkg-share turtle_rl)/turtle_rviz.launch.xml">
+        <arg name="view_only" value="$(var view_only)"/>
+    </include>
+
+    <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
+        <arg name="gz_args" value="-r $(var world)"/>
+    </include>
+
+    <node pkg="ros_gz_sim" exec="create" name="create_turtle" output="screen">
+        <param name="topic" value="/robot_description"/>
+        <param name="x" value="-4.5"/>
+        <param name="y" value="-4.5"/>
+        <param name="z" value="1.0"/>
+        <param name="R" value="0.0"/>
+        <param name="P" value="0.0"/>
+        <param name="Y" value="0.0"/>
+    </node>
+
+    <node pkg="ros_gz_bridge" exec="parameter_bridge" args="
+        /cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist
+        /odom@nav_msgs/msg/Odometry[gz.msgs.Odometry
+        /joint_states@sensor_msgs/msg/JointState@gz.msgs.Model
+        ">
+    </node>
+
+    <node pkg="turtle_rl" exec="moveTest" name="moveTest" />
+
+</launch>
