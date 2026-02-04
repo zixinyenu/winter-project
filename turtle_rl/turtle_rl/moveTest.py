@@ -28,7 +28,7 @@ class moveTest(Node):
         self._is_turning = False
         self._turn_sign = 1
         self._turn_counter = 0
-        self._x_vel = 0.2
+        self._x_vel = 0.3
 
         # Publishers
         self.twist_publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
@@ -38,19 +38,9 @@ class moveTest(Node):
 
     def twist_callback(self):
         """Publish velocity command to the robot."""
-        if self._is_turning:
-            twist = self.get_twist([0.0, 0.0, 0.0], [0.0, 0.0, 0.0])
-            self.twist_publisher_.publish(twist)
-            self._turn_counter = 0
-            self._is_turning = False
-        else:
-            x_vel = self._turn_sign*self._x_vel
-            twist = self.get_twist([x_vel, 0.0, 0.0], [0.0, 0.0, 0.0])
-            self.twist_publisher_.publish(twist)
-            self._turn_counter += 1
-            if self._turn_counter == 3:
-                self._turn_sign = -1 * self._turn_sign
-                self._is_turning = True
+        x_vel = self._x_vel
+        twist = self.get_twist([x_vel, 0.0, 0.0], [0.0, 0.0, 0.0])
+        self.twist_publisher_.publish(twist)
 
     def get_twist(self, linear_vel, angular_vel):
         """
