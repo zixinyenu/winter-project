@@ -1,11 +1,5 @@
 import numpy as np
-from Obstacles import *
-
-LENGTH = 12.0
-WIDTH = 12.0
-ONE_METER = 100
-# TODO Chnage URDF later
-collision_radius = 0.11
+from .Obstacles import *
 
 def chebyshev_distance(m, n):
     row_diff = np.sqrt((n[0] - m[0])**2)
@@ -82,8 +76,6 @@ def a_star(
     i_goal, j_goal = xy2ij(goal_pos[0], goal_pos[1])
     start = (i_start, j_start)
     goal = (i_goal, j_goal)
-
-
 
     open = [start]
     came_from = {}

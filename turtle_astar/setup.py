@@ -37,6 +37,7 @@ setup(
         ('share/' + package_name, ['urdf/turtlebot3_burger.gazebo.xacro']),
         ('share/' + package_name, ['launch/turtle_rviz.launch.xml']),
         ('share/' + package_name, ['launch/turtle.launch.xml']),
+        ('share/' + package_name, ['launch/astar.launch.xml']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -51,7 +52,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'moveTest = turtle_astar.moveTest:main'
+            'moveTest = turtle_astar.moveTest:main',
+            'turtleControl = turtle_astar.turtleControl:main',
         ],
     },
 )

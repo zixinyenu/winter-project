@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 LENGTH = 12.0
 WIDTH = 12.0
-ONE_METER = 100
+ONE_METER = 10
 # TODO Chnage URDF later
 collision_radius = 0.11
 
@@ -143,18 +143,3 @@ def get_obstacle_map(length=12.0, width=12.0, d=ONE_METER):
                 obstacle_list[i][j] = 1
     
     return obstacle_list
-
-# obs_map = get_obstacle_map()
-# counter = 1
-# i_max = int(WIDTH*ONE_METER + 1)
-# j_max = int(LENGTH*ONE_METER + 1)
-# for i in range(0, i_max):
-#     for j in range(0, j_max):
-#         print(counter)
-#         counter += 1
-#         flag = obs_map[i][j]
-#         x, y = ij2xy(i, j)
-#         if flag == 1:
-#             plt.scatter(x, y, color='r')
-
-# plt.show()

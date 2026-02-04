@@ -28,6 +28,6 @@
         ">
     </node>
 
-    <node pkg="turtle_astar" exec="moveTest" name="moveTest" />
+    <node pkg="turtle_astar" exec="turtleControl" name="turtleControl" />
 
 </launch>
