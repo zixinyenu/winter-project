@@ -23,7 +23,7 @@ class turtleControl(Node):
         # Private Variables
         self._cmd_fre = self.get_parameter('cmd_fre').value
         self._start_pst = [1.0, 1.0]
-        self._goal_pst = [3.0, 3.0]
+        self._goal_pst = [4.0, 3.0]
         self._xlist, self._ylist = run_astar(self._start_pst, self._goal_pst, online=False)
         self._waypoint_count = 0
 
@@ -75,7 +75,7 @@ class turtleControl(Node):
                 curr_ori = self._curr_ori
                 euler = euler_from_quaternion(curr_ori)
                 yaw = euler[2]
-                angular_velocity = 0.3*(theta-yaw) # P controller for angular velocity
+                angular_velocity = 0.20*(theta-yaw) # P controller for angular velocity
 
                 # Create Twist message to be published onto /cmd_vel
                 twist = Twist()
