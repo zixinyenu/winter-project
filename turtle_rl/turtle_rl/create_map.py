@@ -20,7 +20,36 @@ def xy2ij(x, y, dx=-6.0, dy=-6.0, d=100):
     j = int((x - dx)*d)
     return i, j
 
-def gen_square_atp(map_length, map_width, d, mean_side, noise):
+def normalize_angle(rad):
+    if abs(rad) >= 2*np.pi:
+        two_pi = int(rad / (2 * np.pi))
+        rad -= two_pi * 2 * np.pi
+    if rad >= np.pi:
+        rad -= 2*np.pi
+    return rad
+
+def rot2d(body_x, body_y, rot_x, rot_y, rad):
+    # Since the randomly generated rotation angle is initialized as
+    # a normalized angle, there is no need to call normalize_angle function
+    # rad = normalize_angle(rad)
+
+    # Convert (rot_x, rot_y) from world frame to body frame
+    x = rot_x - body_x
+    y = rot_y - body_y
+    # Perform pure rotation
+    xp = x*np.cos(rad) - y*np.sin(rad)
+    yp = x*np.sin(rad) + y*np.cos(rad)
+    # Convert them back to world frame
+    xpp = xp + body_x
+    ypp = yp + body_y
+    return (xpp, ypp)
+
+def gen_square_atp(map_length, map_width, d, mean_side, noise, rotate=False):
+    if not rotate:
+        rad = 0.0
+    else:
+        rad = np.random.uniform(low=-np.pi, high=np.pi)
+
     x = np.random.uniform(low=-map_length/2, high=map_length/2)
     y = np.random.uniform(low=-map_width/2, high=map_width/2)
     side = np.random.normal(loc=mean_side, scale=noise)
@@ -34,19 +63,43 @@ def gen_square_atp(map_length, map_width, d, mean_side, noise):
     ystop = (y+side/2)+(1/d)
     xstop = (x+side/2)+(1/d)
 
-    if ystart < -map_width/2 or xstart < -map_length/2 or \
-        ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
-        success = False
-        return 7, 7, -1, [], success
+    if not rotate:
+        if ystart < -map_width/2 or xstart < -map_length/2 or \
+            ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
+            success = False
+            return 7, 7, 6.28, -1, [], success
 
-    for yp in np.arange(start=ystart, stop=ystop, step=1/d):
-        for xp in np.arange(start=xstart, stop=xstop, step=1/d):
-            i, j = xy2ij(xp, yp, -map_length/2, -map_width/2, d)
-            pending_list.append([i, j])
+        for yp in np.arange(start=ystart, stop=ystop, step=1/d):
+            for xp in np.arange(start=xstart, stop=xstop, step=1/d):
+                i, j = xy2ij(xp, yp, -map_length/2, -map_width/2, d)
+                pending_list.append([i, j])
+    else:
+        ne = rot2d(x, y, xstop, ystop, rad)
+        nw = rot2d(x, y, xstart, ystop, rad)
+        sw = rot2d(x, y, xstart, ystart, rad)
+        se = rot2d(x, y, xstop, ystart, rad)
 
-    return x, y, side, pending_list, success
+        if abs(ne[0]) > map_length/2 or abs(ne[1]) > map_width/2 or \
+            abs(nw[0]) > map_length/2 or abs(nw[1]) > map_width/2 or \
+            abs(sw[0]) > map_length/2 or abs(sw[1]) > map_width/2 or \
+            abs(se[0]) > map_length/2 or abs(se[1]) > map_width/2:
+            success = False
+            return 7, 7, 6.28, -1, [], success
 
-def gen_rectangle_atp(map_length, map_width, d, mean_len, mean_wdt, noise):
+        for yp in np.arange(start=ystart, stop=ystop, step=1/d):
+            for xp in np.arange(start=xstart, stop=xstop, step=1/d):
+                rot_point = rot2d(x, y, xp, yp, rad)
+                i, j = xy2ij(rot_point[0], rot_point[1], -map_length/2, -map_width/2, d)
+                pending_list.append([i, j])
+
+    return x, y, rad, side, pending_list, success
+
+def gen_rectangle_atp(map_length, map_width, d, mean_len, mean_wdt, noise, rotate=False):
+    if not rotate:
+        rad = 0.0
+    else:
+        rad = np.random.uniform(low=-np.pi, high=np.pi)
+
     x = np.random.uniform(low=-map_length/2, high=map_length/2)
     y = np.random.uniform(low=-map_width/2, high=map_width/2)
     length = np.random.normal(loc=mean_len, scale=noise)
@@ -62,17 +115,36 @@ def gen_rectangle_atp(map_length, map_width, d, mean_len, mean_wdt, noise):
     ystop = (y+width/2)+(1/d)
     xstop = (x+length/2)+(1/d)
 
-    if ystart < -map_width/2 or xstart < -map_length/2 or \
-        ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
-        success = False
-        return 7, 7, -1, -1, [], success
+    if not rotate:
+        if ystart < -map_width/2 or xstart < -map_length/2 or \
+            ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
+            success = False
+            return 7, 7, 6.28, -1, -1, [], success
 
-    for yp in np.arange(start=ystart, stop=ystop, step=1/d):
-        for xp in np.arange(start=xstart, stop=xstop, step=1/d):
-            i, j = xy2ij(xp, yp, -map_length/2, -map_width/2, d)
-            pending_list.append([i, j])
+        for yp in np.arange(start=ystart, stop=ystop, step=1/d):
+            for xp in np.arange(start=xstart, stop=xstop, step=1/d):
+                i, j = xy2ij(xp, yp, -map_length/2, -map_width/2, d)
+                pending_list.append([i, j])
+    else:
+        ne = rot2d(x, y, xstop, ystop, rad)
+        nw = rot2d(x, y, xstart, ystop, rad)
+        sw = rot2d(x, y, xstart, ystart, rad)
+        se = rot2d(x, y, xstop, ystart, rad)
 
-    return x, y, length, width, pending_list, success
+        if abs(ne[0]) > map_length/2 or abs(ne[1]) > map_width/2 or \
+            abs(nw[0]) > map_length/2 or abs(nw[1]) > map_width/2 or \
+            abs(sw[0]) > map_length/2 or abs(sw[1]) > map_width/2 or \
+            abs(se[0]) > map_length/2 or abs(se[1]) > map_width/2:
+            success = False
+            return 7, 7, 6.28, -1, -1, [], success
+
+        for yp in np.arange(start=ystart, stop=ystop, step=1/d):
+            for xp in np.arange(start=xstart, stop=xstop, step=1/d):
+                rot_point = rot2d(x, y, xp, yp, rad)
+                i, j = xy2ij(rot_point[0], rot_point[1], -map_length/2, -map_width/2, d)
+                pending_list.append([i, j])
+
+    return x, y, rad, length, width, pending_list, success
 
 def gen_cylinder_apt(map_length, map_width, d, mean_radius, noise):
     x = np.random.uniform(low=-map_length/2, high=map_length/2)
@@ -125,28 +197,29 @@ def create_map(
     cylinder_list = []
     
     # Generate fixed number of obstacles: 2 squares + 4 rectangles + 2 cylinders
+    # Obstacles has fixed default orientation: 0.0
     # Obstacles of same type tend to have similar size
     if randomness == 1:
         square_count = 0
         while square_count < 2:
-            x, y, side, pending_list, success = gen_square_atp(map_length, map_width, divison, 1.0, 0.1)
+            x, y, rad, side, pending_list, success = gen_square_atp(map_length, map_width, divison, 1.0, 0.1)
             if not success:
                 continue
             flag = check_collision(obstacle_list, pending_list)
             if flag:
                 continue
-            square_list.append([x, y, side])
+            square_list.append([x, y, rad, side])
             square_count += 1
 
         rectangle_count = 0
         while rectangle_count < 4:
-            x, y, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 2.7, 1.3, 0.2)
+            x, y, rad, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 2.7, 1.3, 0.2)
             if not success:
                 continue
             flag = check_collision(obstacle_list, pending_list)
             if flag:
                 continue
-            rectangle_list.append([x, y, length, width])
+            rectangle_list.append([x, y, rad, length, width])
             rectangle_count += 1
 
         cylinder_count = 0
@@ -159,10 +232,46 @@ def create_map(
                 continue
             cylinder_list.append([x, y, radius])
             cylinder_count += 1
+    # Generate fixed number of obstacles: 2 squares + 4 rectangles + 2 cylinders
+    # Obstacles has random orientation
+    # Obstacles of same type tend to have relatively different size
+    elif randomness == 2:
+        square_count = 0
+        while square_count < 2:
+            x, y, rad, side, pending_list, success = gen_square_atp(map_length, map_width, divison, 1.0, 0.3, True)
+            if not success:
+                continue
+            flag = check_collision(obstacle_list, pending_list)
+            if flag:
+                continue
+            square_list.append([x, y, rad, side])
+            square_count += 1
+
+        rectangle_count = 0
+        while rectangle_count < 4:
+            x, y, rad, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 2.7, 1.3, 0.4, True)
+            if not success:
+                continue
+            flag = check_collision(obstacle_list, pending_list)
+            if flag:
+                continue
+            rectangle_list.append([x, y, rad, length, width])
+            rectangle_count += 1
+
+        cylinder_count = 0
+        while cylinder_count < 2:
+            x, y, radius, pending_list, success = gen_cylinder_apt(map_length, map_width, divison, 0.75, 0.15)
+            if not success:
+                continue
+            flag = check_collision(obstacle_list, pending_list)
+            if flag:
+                continue
+            cylinder_list.append([x, y, radius])
+            cylinder_count += 1
     
     return obstacle_list, square_list, rectangle_list, cylinder_list
 
-ol, sl, rl, cy = create_map()
+ol, sl, rl, cy = create_map(randomness=2)
 xl = []
 yl = []
 for i in range(1201):
