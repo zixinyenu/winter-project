@@ -182,11 +182,50 @@ def check_collision(obstacle_list, pending_list):
         [i, j] = pixel
         obstacle_list[i][j] = 1
     return False
+
+########## TURTLE_FUNCTIONS_START ##########
+def gen_turtle_apt(map_length, map_width, d, collision_radius, noise):
+    x = np.random.uniform(low=-map_length/2, high=map_length/2)
+    y = np.random.uniform(low=-map_width/2, high=map_width/2)
+    radius = np.random.normal(loc=collision_radius, scale=noise)
+    radius = abs(radius)
+
+    pending_list = []
+    success = True
+
+    ystart = y-radius
+    xstart = x-radius
+    ystop = (y+radius)+(1/d)
+    xstop = (x+radius)+(1/d)
+
+    if ystart < -map_width/2 or xstart < -map_length/2 or \
+        ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
+        success = False
+        return 7, 7, 6.28, -1, [], success
+    for yp in np.arange(start=ystart, stop=ystop, step=1/d):
+        for xp in np.arange(start=xstart, stop=xstop, step=1/d):
+            if (yp - y)**2 + (xp-x)**2 > radius**2:
+                continue
+            i, j = xy2ij(xp, yp, -map_length/2, -map_width/2, d)
+            pending_list.append([i, j])
+
+    rad = np.random.uniform(low=-np.pi, high=np.pi)
+
+    return x, y, rad, radius, pending_list, success
+
+def check_turtle_collision(obstacle_list, pending_list):
+    for pixel in pending_list:
+        [i, j] = pixel
+        if obstacle_list[i][j] == 1:
+            return True
+    return False
+########## TURTLE_FUNCTIONS_END ##########
         
 def create_map(
         map_length = 12,
         map_width = 12,
         divison = 100,
+        collision_radius=0.11,
         randomness = 1,
 ):
     i_max = int(map_width*divison + 1)
@@ -195,9 +234,11 @@ def create_map(
     square_list = []
     rectangle_list = []
     cylinder_list = []
+    turtle_param = []
+    turtle_goal = [-7.0, -7.0]
     
     # Generate fixed number of obstacles: 2 squares + 4 rectangles + 2 cylinders
-    # Obstacles has fixed default orientation: 0.0
+    # Obstacles have fixed default orientation: 0.0
     # Obstacles of same type tend to have similar size
     if randomness == 1:
         square_count = 0
@@ -233,7 +274,7 @@ def create_map(
             cylinder_list.append([x, y, radius])
             cylinder_count += 1
     # Generate fixed number of obstacles: 2 squares + 4 rectangles + 2 cylinders
-    # Obstacles has random orientation
+    # Obstacles have random orientation
     # Obstacles of same type tend to have relatively different size
     elif randomness == 2:
         square_count = 0
@@ -268,10 +309,25 @@ def create_map(
                 continue
             cylinder_list.append([x, y, radius])
             cylinder_count += 1
-    
-    return obstacle_list, square_list, rectangle_list, cylinder_list
 
-ol, sl, rl, cy = create_map(randomness=2)
+    turtle_count = 0
+    while turtle_count < 2:
+        x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length, map_width, divison, collision_radius, 0.0)
+        if not success:
+            continue
+        flag = check_turtle_collision(obstacle_list, pending_list)
+        if flag:
+            continue
+        if turtle_count == 0:
+            turtle_param = [x, y, rad]
+        else:
+            turtle_goal[0] = x
+            turtle_goal[1] = y
+        turtle_count += 1
+
+    return obstacle_list, square_list, rectangle_list, cylinder_list, turtle_param, turtle_goal
+
+ol, sl, rl, cy, tp, tg= create_map(randomness=2)
 xl = []
 yl = []
 for i in range(1201):
@@ -280,7 +336,13 @@ for i in range(1201):
             x, y = ij2xy(i, j)
             xl.append(x)
             yl.append(y)
-plt.plot(xl, yl, 'r.')
+fig, ax = plt.subplots()
+plt.plot(xl, yl, 'r.', label="obstacles")
+turtle_circle = plt.Circle((tp[0], tp[1]), 0.11, color='blue', label="turtle start position")
+ax.add_patch(turtle_circle)
+plt.arrow(tp[0], tp[1], np.sin(tp[2]), np.cos(tp[2]), width=0.05, label="turtle start orientation")
+plt.plot(tg[0], tg[1], 'g^', label="turtle goal")
 plt.xlim([-6, 6])
 plt.ylim([-6, 6])
+plt.legend(loc="upper right")
 plt.show()
