@@ -2,7 +2,7 @@ import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
 
-class SimplifiedEnv(gym.Env):
+class simplified_env(gym.Env):
     """Custom Environment that follows gym interface."""
 
     def __init__(self):

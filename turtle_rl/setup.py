@@ -53,7 +53,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'moveTest = turtle_rl.moveTest:main'
+            'moveTest = turtle_rl.moveTest:main',
+            'turtle_env = turtle_rl.turtle_env:main'
         ],
     },
 )
