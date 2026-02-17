@@ -8,6 +8,8 @@
       <xacro:include filename="$(find turtle_rl)/turtlebot3_burger.gazebo.xacro" />
   </xacro:if>
 
+  <xacro:property name="collision_radius" value="0.11"/>
+
   <!-- Init colour -->
   <material name="black">
       <color rgba="0.0 0.0 0.0 1.0"/>
@@ -69,7 +71,7 @@
     <collision>
       <origin xyz="-0.032 0 0.070" rpy="0 0 0"/>
       <geometry>
-        <box size="0.140 0.140 0.143"/>
+        <cylinder length="0.143" radius="${collision_radius}"/>
       </geometry>
     </collision>
 
