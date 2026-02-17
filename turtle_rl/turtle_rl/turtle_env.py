@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
-from nav_msgs.msg import Odometry
 from tf2_msgs.msg import TFMessage
 
 from tf_transformations import euler_from_quaternion
@@ -21,15 +21,25 @@ class turtle_env(Node):
         self.laser_sub = self.create_subscription(LaserScan, 'scan', self.laser_callback, 1)
         self.turtle_pos_sub = self.create_subscription(TFMessage, '/groundtruth_pose', self.turtle_pos_callback, 1)
 
+        # Publisher
+        self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+
         # Class variables
         self._laser_readings = np.array([np.float32(10)]*360) # LSD-02 can ony detect up to 8m, so 10m for inf
         self._turtle_pos = np.array([np.float32(0), np.float32(0)])
         self._turtle_ori = np.float32(0)
 
+    def cmd_vel_publish(self, vel_list):
+        msg = Twist()
+        msg.linear.x = vel_list[0]
+        msg.angular.z = vel_list[1]
+        self.cmd_vel_pub.publish(msg)
+
     def laser_callback(self, msg: LaserScan):
-        self._laser_readings = np.array(msg.ranges)
+        laser_reading = np.array(msg.ranges)
         # Convert infinity to 10m, since LSD-02 can only detect up to 8m
-        self._laser_readings[self._laser_readings == np.inf] =np.float32(10)
+        laser_reading[laser_reading == np.inf] = np.float32(10)
+        self._laser_readings = laser_reading
 
     def turtle_pos_callback(self, msg: TFMessage):
         # /groundtruth_pose contains TFMessage type message
@@ -48,8 +58,8 @@ class turtle_env(Node):
                 tf.transform.rotation.z
             ])
             self._turtle_ori = angles[2]
-        self.get_logger().info(f'turtle pos: {self._turtle_pos[0]}, {self._turtle_pos[1]}')
-        self.get_logger().info(f'turtle ori: {self._turtle_ori}')
+        # self.get_logger().info(f'turtle pos: {self._turtle_pos[0]}, {self._turtle_pos[1]}')
+        # self.get_logger().info(f'turtle ori: {self._turtle_ori}')
 
 
 def main(args=None):
