@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
+from tf2_msgs.msg import TFMessage
 
 from tf_transformations import euler_from_quaternion
 
@@ -18,7 +19,7 @@ class turtle_env(Node):
 
         # Subscription
         self.laser_sub = self.create_subscription(LaserScan, 'scan', self.laser_callback, 1)
-        self.turtle_pos_sub = self.create_subscription(Odometry, 'odom', self.turtle_pos_callback, 1)
+        self.turtle_pos_sub = self.create_subscription(TFMessage, '/groundtruth_pose', self.turtle_pos_callback, 1)
 
         # Class variables
         self._laser_readings = np.array([np.float32(10)]*360) # LSD-02 can ony detect up to 8m, so 10m for inf
@@ -30,19 +31,25 @@ class turtle_env(Node):
         # Convert infinity to 10m, since LSD-02 can only detect up to 8m
         self._laser_readings[self._laser_readings == np.inf] =np.float32(10)
 
-    def turtle_pos_callback(self, msg: Odometry):
-        # clip?
-        self._turtle_pos = np.array([
-            np.float32(msg.pose.pose.position.x),
-            np.float32(msg.pose.pose.position.y)
-        ])
-        angles = euler_from_quaternion([
-            msg.pose.pose.orientation.w,
-            msg.pose.pose.orientation.x,
-            msg.pose.pose.orientation.y,
-            msg.pose.pose.orientation.z
-        ])
-        self._turtle_ori = angles[2]
+    def turtle_pos_callback(self, msg: TFMessage):
+        # /groundtruth_pose contains TFMessage type message
+        # it is like a pose vector or pose list
+        # the one with child_frame_id: turtlebot3_burger is groundtruth pose of the turtlebot3
+        for tf in msg.transforms:
+            if tf.child_frame_id == "turtlebot3_burger":
+                self._turtle_pos = np.array([
+                    np.float32(tf.transform.translation.x),
+                    np.float32(tf.transform.translation.y)
+                ])
+            angles = euler_from_quaternion([
+                tf.transform.rotation.w,
+                tf.transform.rotation.x,
+                tf.transform.rotation.y,
+                tf.transform.rotation.z
+            ])
+            self._turtle_ori = angles[2]
+        self.get_logger().info(f'turtle pos: {self._turtle_pos[0]}, {self._turtle_pos[1]}')
+        self.get_logger().info(f'turtle ori: {self._turtle_ori}')
 
 
 def main(args=None):
