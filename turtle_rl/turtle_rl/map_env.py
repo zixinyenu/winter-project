@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 """Convert [i][j] in list to (x, y) location.
 
@@ -238,7 +239,7 @@ def create_map(
     turtle_goal = [-7.0, -7.0]
     
     # Generate fixed number of obstacles: 2 squares + 4 rectangles + 2 cylinders
-    # Obstacles have fixed default orientation: 0.0
+    # Obstacles have random positions and a fixed default orientation: 0.0
     # Obstacles of same type tend to have similar size
     if randomness == 1:
         square_count = 0
@@ -274,7 +275,7 @@ def create_map(
             cylinder_list.append([x, y, radius])
             cylinder_count += 1
     # Generate fixed number of obstacles: 2 squares + 4 rectangles + 2 cylinders
-    # Obstacles have random orientation
+    # Obstacles have random positions and orientations
     # Obstacles of same type tend to have relatively different size
     elif randomness == 2:
         square_count = 0
@@ -310,6 +311,90 @@ def create_map(
             cylinder_list.append([x, y, radius])
             cylinder_count += 1
 
+    # Generate random number of each type of obstacles: squares + rectangles + cylinders
+    # Obstacles have random positions and orientations
+    # Obstacles of same type tend to have relatively more different size
+    # More realistic for the problem framing of the turtle_rl package
+    elif randomness == 3:
+        total = 20
+
+        square_total = int(np.random.normal(loc=6, scale=2))
+        rectangle_total = int(np.random.normal(loc=8, scale=2))
+        cylinder_total = total - square_total - rectangle_total
+
+        small_square_total = np.random.randint(low=1, high=square_total+1)
+        big_square_total = square_total - small_square_total
+        slim_rectangle_total = np.random.randint(low=1, high=rectangle_total+1)
+        thick_rectangle_total = rectangle_total - slim_rectangle_total
+        small_cylinder_total = np.random.randint(low=1, high=cylinder_total+1)
+        big_cylinder_total = cylinder_total - small_cylinder_total
+
+        small_square_count = 0
+        while small_square_count < small_square_total:
+            x, y, rad, side, pending_list, success = gen_square_atp(map_length, map_width, divison, 0.4, 0.1, True)
+            if not success:
+                continue
+            flag = check_collision(obstacle_list, pending_list)
+            if flag:
+                continue
+            square_list.append([x, y, rad, side])
+            small_square_count += 1
+
+        big_square_count = 0
+        while big_square_count < big_square_total:
+            x, y, rad, side, pending_list, success = gen_square_atp(map_length, map_width, divison, 0.8, 0.15, True)
+            if not success:
+                continue
+            flag = check_collision(obstacle_list, pending_list)
+            if flag:
+                continue
+            square_list.append([x, y, rad, side])
+            big_square_count += 1
+
+        slim_rectangle_count = 0
+        while slim_rectangle_count < slim_rectangle_total:
+            x, y, rad, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 0.8, 0.15, 0.05, True)
+            if not success:
+                continue
+            flag = check_collision(obstacle_list, pending_list)
+            if flag:
+                continue
+            rectangle_list.append([x, y, rad, length, width])
+            slim_rectangle_count += 1
+
+        thick_rectangle_count = 0
+        while thick_rectangle_count < thick_rectangle_total:
+            x, y, rad, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 0.6, 0.4, 0.05, True)
+            if not success:
+                continue
+            flag = check_collision(obstacle_list, pending_list)
+            if flag:
+                continue
+            rectangle_list.append([x, y, rad, length, width])
+            thick_rectangle_count += 1
+
+        small_cylinder_count = 0
+        while small_cylinder_count < small_cylinder_total:
+            x, y, radius, pending_list, success = gen_cylinder_apt(map_length, map_width, divison, 0.3, 0.05)
+            if not success:
+                continue
+            flag = check_collision(obstacle_list, pending_list)
+            if flag:
+                continue
+            cylinder_list.append([x, y, radius])
+            small_cylinder_count += 1
+
+        big_cylinder_count = 0
+        while big_cylinder_count < big_cylinder_total:
+            x, y, radius, pending_list, success = gen_cylinder_apt(map_length, map_width, divison, 0.6, 0.1)
+            if not success:
+                continue
+            flag = check_collision(obstacle_list, pending_list)
+            if flag:
+                continue
+            cylinder_list.append([x, y, radius])
+            big_cylinder_count += 1
+
     turtle_count = 0
     while turtle_count < 2:
         x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length, map_width, divison, collision_radius, 0.0)
@@ -327,22 +412,127 @@ def create_map(
 
     return obstacle_list, square_list, rectangle_list, cylinder_list, turtle_param, turtle_goal
 
-ol, sl, rl, cy, tp, tg= create_map(randomness=2)
-xl = []
-yl = []
-for i in range(1201):
-    for j in range(1201):
-        if ol[i][j] == 1:
-            x, y = ij2xy(i, j)
-            xl.append(x)
-            yl.append(y)
-fig, ax = plt.subplots()
-plt.plot(xl, yl, 'r.', label="obstacles")
-turtle_circle = plt.Circle((tp[0], tp[1]), 0.11, color='blue', label="turtle start position")
-ax.add_patch(turtle_circle)
-plt.arrow(tp[0], tp[1], np.sin(tp[2]), np.cos(tp[2]), width=0.05, label="turtle start orientation")
-plt.plot(tg[0], tg[1], 'g^', label="turtle goal")
-plt.xlim([-6, 6])
-plt.ylim([-6, 6])
-plt.legend(loc="upper right")
-plt.show()
+def create_new_world(parent_directory_name, world_id):
+    child_directory_name  = f'world_episode_{world_id}'
+    try:
+        os.mkdir(f'{parent_directory_name}/{child_directory_name}')
+        print(f"Directory {child_directory_name} created successfully. Path returned.")
+        return f'{parent_directory_name}/{child_directory_name}'
+    except FileExistsError:
+        print(f"Directory {child_directory_name} already exists. Path returned.")
+        return f'{parent_directory_name}/{child_directory_name}'
+    except PermissionError:
+        print(f"Permission denied: unable to create '{child_directory_name}'.")
+    except Exception as e:
+        print(f"An error occurred: {e}.")
+
+def create_squares(square_list, square_id, world_dir):
+    mass = 120
+    # square: [x, y, rad, side] - pose does not work, need to specify it in srv
+    for square in square_list:
+        with open(f"{world_dir}/square_{square_id}.sdf", "x") as f:
+            x = square[0]
+            y = square[1]
+            oz = square[2]
+            side = square[3]
+            ixx = mass / 12 * (2 * side**2)
+            iyy = mass / 12 * (2 * side**2)
+            izz = mass / 12 * (2 * side**2)
+            f.writelines([
+                "<sdf version='1.12'>\n",
+               f"  <model name='square_{square_id}'>\n",
+               f"    <pose>{x} {y} 0.5 0.0 0.0 {oz}</pose>\n",
+                "    <link name='box_link'>\n",
+                "      <inertial>\n",
+                "        <inertia>\n",
+               f"          <ixx>{ixx}</ixx>\n",
+                "          <ixy>0</ixy>\n",
+                "          <ixz>0</ixz>\n",
+               f"          <iyy>{iyy}</iyy>\n",
+                "          <iyz>0</iyz>\n",
+               f"          <izz>{izz}</izz>\n",
+                "        </inertia>\n",
+               f"        <mass>{mass}</mass>\n",
+                "        <pose>0 0 0 0 0 0</pose>\n",
+                "      </inertial>\n",
+                "      <collision name='box_collision'>\n",
+                "        <geometry>\n",
+                "          <box>\n",
+               f"            <size>{side} {side} 1.0</size>\n",
+                "          </box>\n",
+                "        </geometry>\n",
+                "        <surface>\n",
+                "          <friction>\n",
+                "            <ode/>\n",
+                "          </friction>\n",
+                "          <bounce/>\n",
+                "          <contact/>\n",
+                "        </surface>\n",
+                "      </collision>\n",
+                "      <visual name='box_visual'>\n",
+                "        <geometry>\n",
+                "          <box>\n",
+                f"            <size>{side} {side} 1.0</size>\n",
+                "          </box>\n",
+                "        </geometry>\n",
+                "        <material>\n",
+                "          <ambient>0.300000012 0.300000012 0.300000012 1</ambient>\n",
+                "          <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>\n",
+                "          <specular>1 1 1 1</specular>\n",
+                "        </material>\n",
+                "      </visual>\n",
+                "      <pose>0 0 0 0 0 0</pose>\n",
+                "      <enable_wind>false</enable_wind>\n",
+                "    </link>\n",
+                "    <static>false</static>\n",
+                "    <self_collide>false</self_collide>\n",
+                "  </model>\n",
+                "</sdf>\n",
+            ])
+
+def create_rectangles(rectangle_list, rectangle_id, world_dir):
+    # rectangle: [x, y, rad, length, width]
+    for rectangle in rectangle_list:
+        with open(f"{world_dir}/rectangle_{rectangle_id}.sdf", "x") as f:
+            f.writelines([
+                "<sdf version='1.12'>\n",
+                "</sdf>\n",
+            ])
+
+def create_cylinders(cylinder_list, cylinder_id, world_dir):
+    # cylinder: [x, y, radius]
+    for cylinder in cylinder_list:
+        with open(f"{world_dir}/cylinder_{cylinder_id}.sdf", "x") as f:
+            f.writelines([
+                "<sdf version='1.12'>\n",
+                "</sdf>\n",
+            ])
+
+package_path = os.path.abspath(os.path.join(
+    os.getcwd(),
+    os.pardir
+))
+parent_working_path = f'{package_path}/worlds'
+print(parent_working_path)
+world_dir = create_new_world(parent_working_path, world_id=1)
+create_squares([[1.0, 1.0, 1.57, 0.5]], 1, world_dir)
+
+# ol, sl, rl, cy, tp, tg= create_map(randomness=3)
+# xl = []
+# yl = []
+# for i in range(1201):
+#     for j in range(1201):
+#         if ol[i][j] == 1:
+#             x, y = ij2xy(i, j)
+#             xl.append(x)
+#             yl.append(y)
+# fig, ax = plt.subplots()
+# plt.plot(xl, yl, 'r.', label="obstacles")
+# turtle_circle = plt.Circle((tp[0], tp[1]), 0.11, color='blue', label="turtle start position")
+# ax.add_patch(turtle_circle)
+# plt.arrow(tp[0], tp[1], np.sin(tp[2]), np.cos(tp[2]), width=0.05, label="turtle start orientation")
+# plt.plot(tg[0], tg[1], 'g^', label="turtle goal")
+# plt.xlim([-6, 6])
+# plt.ylim([-6, 6])
+# plt.legend(loc="upper right")
+# plt.show()
