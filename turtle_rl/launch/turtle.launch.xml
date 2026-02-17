@@ -1,6 +1,7 @@
 <launch>
 
     <arg name="world" default="$(find-pkg-share turtle_rl)/worlds/turtle.world.sdf" description="World sdf file path." />
+    <arg name="world_name" default="empty" description="Name of the world." />
     <arg name="gz_gui_config" default="$(find-pkg-share turtle_rl)/gazebo_gui.config" description="Gazebo GUI configuration." />
     <arg name="view_only" default="false" description="True to view Rviz, default as false" />
 
@@ -47,11 +48,20 @@
             direction="GZ_TO_ROS" />
         <!--########## GZ_to_ROS_Bridge_End ##########-->
 
-        <!--
+        <!--########## Service_Bridge_Start ##########-->
         <service service_name="/world/$(var world_name)/control"
                 ros_type_name="ros_gz_interfaces/srv/ControlWorld"
                 gz_req_type_name="gz.msgs.WorldControl" gz_rep_type_name="gz.msgs.Boolean" />
-        -->
+        <service service_name="/world/$(var world_name)/set_pose"
+                ros_type_name="ros_gz_interfaces/srv/SetEntityPose"
+                gz_req_type_name="gz.msgs.Pose" gz_rep_type_name="gz.msgs.Boolean" />
+        <service service_name="/world/$(var world_name)/create"
+                ros_type_name="ros_gz_interfaces/srv/SpawnEntity"
+                gz_req_type_name="gz.msgs.EntityFactory" gz_rep_type_name="gz.msgs.Boolean" />
+        <service service_name="/world/$(var world_name)/remove"
+                ros_type_name="ros_gz_interfaces/srv/DeleteEntity"
+                gz_req_type_name="gz.msgs.Entity" gz_rep_type_name="gz.msgs.Boolean" />
+        <!--########## Service_Bridge_End ##########-->
     </ros_gz_bridge>
 
     <node pkg="turtle_rl" exec="moveTest" name="moveTest" />
