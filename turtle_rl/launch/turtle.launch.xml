@@ -22,7 +22,7 @@
         <param name="Y" value="0.0"/>
     </node>
 
-    <ros_gz_bridge bridge_name="test_bridge">
+    <ros_gz_bridge bridge_name="bridge">
         <!--########## ROS_to_GZ_Bridge_Start ##########-->
         <topic ros_topic_name="/cmd_vel" gz_topic_name="/cmd_vel"
             ros_type_name="geometry_msgs/msg/Twist" gz_type_name="gz.msgs.Twist"
@@ -39,8 +39,8 @@
         <topic ros_topic_name="/joint_states" gz_topic_name="/joint_states"
             ros_type_name="sensor_msgs/msg/JointState" gz_type_name="gz.msgs.Model"
             direction="GZ_TO_ROS" />
-        <topic ros_topic_name="/groundtruth_pose" gz_topic_name="/world/empty/pose/info"
-            ros_type_name="geometry_msgs/msg/PoseArray" gz_type_name="gz.msgs.Pose_V"
+        <topic ros_topic_name="/groundtruth_pose" gz_topic_name="/turtlebot3_burger/pose_static"
+            ros_type_name="tf2_msgs/msg/TFMessage" gz_type_name="gz.msgs.Pose_V"
             direction="GZ_TO_ROS" />
         <topic ros_topic_name="/fence/touched" gz_topic_name="/fence/touched"
             ros_type_name="std_msgs/msg/Bool" gz_type_name="gz.msgs.Boolean"
