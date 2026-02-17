@@ -71,14 +71,14 @@
       <link name='box_link'>
         <inertial>
           <inertia>
-            <ixx>0.16666</ixx>
+            <ixx>16.666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.16666</iyy>
+            <iyy>16.666</iyy>
             <iyz>0</iyz>
-            <izz>0.16666</izz>
+            <izz>16.666</izz>
           </inertia>
-          <mass>1</mass>
+          <mass>100</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='box_collision'>
@@ -130,14 +130,14 @@
         </sensor>
         <inertial>
           <inertia>
-            <ixx>0.16666</ixx>
+            <ixx>16.666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.16666</iyy>
+            <iyy>16.666</iyy>
             <iyz>0</iyz>
-            <izz>0.16666</izz>
+            <izz>16.666</izz>
           </inertia>
-          <mass>1</mass>
+          <mass>100</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='box_collision'>
@@ -177,14 +177,14 @@
       <link name='box_link'>
         <inertial>
           <inertia>
-            <ixx>0.16666</ixx>
+            <ixx>16.666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.16666</iyy>
+            <iyy>16.666</iyy>
             <iyz>0</iyz>
-            <izz>0.16666</izz>
+            <izz>16.666</izz>
           </inertia>
-          <mass>1</mass>
+          <mass>100</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='box_collision'>
@@ -224,14 +224,14 @@
       <link name='box_link'>
         <inertial>
           <inertia>
-            <ixx>0.16666</ixx>
+            <ixx>16.666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.16666</iyy>
+            <iyy>16.666</iyy>
             <iyz>0</iyz>
-            <izz>0.16666</izz>
+            <izz>16.666</izz>
           </inertia>
-          <mass>1</mass>
+          <mass>100</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='box_collision'>
