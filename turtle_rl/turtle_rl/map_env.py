@@ -426,69 +426,69 @@ def create_new_world(parent_directory_name, world_id):
     except Exception as e:
         print(f"An error occurred: {e}.")
 
-def create_squares(square_list, square_id, world_dir):
+def create_squares(square_param, square_id, world_dir):
     mass = 120
     # square: [x, y, rad, side] - pose does not work, need to specify it in srv
-    for square in square_list:
-        with open(f"{world_dir}/square_{square_id}.sdf", "x") as f:
-            x = square[0]
-            y = square[1]
-            oz = square[2]
-            side = square[3]
-            ixx = mass / 12 * (2 * side**2)
-            iyy = mass / 12 * (2 * side**2)
-            izz = mass / 12 * (2 * side**2)
-            f.writelines([
-                "<sdf version='1.12'>\n",
-               f"  <model name='square_{square_id}'>\n",
-               f"    <pose>{x} {y} 0.5 0.0 0.0 {oz}</pose>\n",
-                "    <link name='box_link'>\n",
-                "      <inertial>\n",
-                "        <inertia>\n",
-               f"          <ixx>{ixx}</ixx>\n",
-                "          <ixy>0</ixy>\n",
-                "          <ixz>0</ixz>\n",
-               f"          <iyy>{iyy}</iyy>\n",
-                "          <iyz>0</iyz>\n",
-               f"          <izz>{izz}</izz>\n",
-                "        </inertia>\n",
-               f"        <mass>{mass}</mass>\n",
-                "        <pose>0 0 0 0 0 0</pose>\n",
-                "      </inertial>\n",
-                "      <collision name='box_collision'>\n",
-                "        <geometry>\n",
-                "          <box>\n",
-               f"            <size>{side} {side} 1.0</size>\n",
-                "          </box>\n",
-                "        </geometry>\n",
-                "        <surface>\n",
-                "          <friction>\n",
-                "            <ode/>\n",
-                "          </friction>\n",
-                "          <bounce/>\n",
-                "          <contact/>\n",
-                "        </surface>\n",
-                "      </collision>\n",
-                "      <visual name='box_visual'>\n",
-                "        <geometry>\n",
-                "          <box>\n",
-                f"            <size>{side} {side} 1.0</size>\n",
-                "          </box>\n",
-                "        </geometry>\n",
-                "        <material>\n",
-                "          <ambient>0.300000012 0.300000012 0.300000012 1</ambient>\n",
-                "          <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>\n",
-                "          <specular>1 1 1 1</specular>\n",
-                "        </material>\n",
-                "      </visual>\n",
-                "      <pose>0 0 0 0 0 0</pose>\n",
-                "      <enable_wind>false</enable_wind>\n",
-                "    </link>\n",
-                "    <static>false</static>\n",
-                "    <self_collide>false</self_collide>\n",
-                "  </model>\n",
-                "</sdf>\n",
-            ])
+    with open(f"{world_dir}/square_{square_id}.sdf", "x") as f:
+        x = square_param[0]
+        y = square_param[1]
+        oz = square_param[2]
+        side = square_param[3]
+        ixx = mass / 12 * (2 * side**2)
+        iyy = mass / 12 * (2 * side**2)
+        izz = mass / 12 * (2 * side**2)
+        f.writelines([
+            "<sdf version='1.12'>\n",
+            f"  <model name='square_{square_id}'>\n",
+            f"    <pose>{x} {y} 0.5 0.0 0.0 {oz}</pose>\n",
+            "    <link name='box_link'>\n",
+            "      <inertial>\n",
+            "        <inertia>\n",
+            f"          <ixx>{ixx}</ixx>\n",
+            "          <ixy>0</ixy>\n",
+            "          <ixz>0</ixz>\n",
+            f"          <iyy>{iyy}</iyy>\n",
+            "          <iyz>0</iyz>\n",
+            f"          <izz>{izz}</izz>\n",
+            "        </inertia>\n",
+            f"        <mass>{mass}</mass>\n",
+            "        <pose>0 0 0 0 0 0</pose>\n",
+            "      </inertial>\n",
+            "      <collision name='box_collision'>\n",
+            "        <geometry>\n",
+            "          <box>\n",
+            f"            <size>{side} {side} 1.0</size>\n",
+            "          </box>\n",
+            "        </geometry>\n",
+            "        <surface>\n",
+            "          <friction>\n",
+            "            <ode/>\n",
+            "          </friction>\n",
+            "          <bounce/>\n",
+            "          <contact/>\n",
+            "        </surface>\n",
+            "      </collision>\n",
+            "      <visual name='box_visual'>\n",
+            "        <geometry>\n",
+            "          <box>\n",
+            f"            <size>{side} {side} 1.0</size>\n",
+            "          </box>\n",
+            "        </geometry>\n",
+            "        <material>\n",
+            "          <ambient>0.300000012 0.300000012 0.300000012 1</ambient>\n",
+            "          <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>\n",
+            "          <specular>1 1 1 1</specular>\n",
+            "        </material>\n",
+            "      </visual>\n",
+            "      <pose>0 0 0 0 0 0</pose>\n",
+            "      <enable_wind>false</enable_wind>\n",
+            "    </link>\n",
+            "    <static>false</static>\n",
+            "    <self_collide>false</self_collide>\n",
+            "  </model>\n",
+            "</sdf>\n",
+        ])
+    return f"{world_dir}/square_{square_id}.sdf"
 
 def create_rectangles(rectangle_list, rectangle_id, world_dir):
     # rectangle: [x, y, rad, length, width]
@@ -508,14 +508,13 @@ def create_cylinders(cylinder_list, cylinder_id, world_dir):
                 "</sdf>\n",
             ])
 
-package_path = os.path.abspath(os.path.join(
-    os.getcwd(),
-    os.pardir
-))
-parent_working_path = f'{package_path}/worlds'
-print(parent_working_path)
-world_dir = create_new_world(parent_working_path, world_id=1)
-create_squares([[1.0, 1.0, 1.57, 0.5]], 1, world_dir)
+# package_path = os.path.abspath(os.path.join(
+#     os.getcwd(),
+#     os.pardir
+# ))
+# worlds_path = f'{package_path}/worlds'
+# world_path = create_new_world(worlds_path, world_id=0)
+# create_squares([[1.0, 1.0, 1.57, 0.5]], 0, world_path)
 
 # ol, sl, rl, cy, tp, tg= create_map(randomness=3)
 # xl = []
