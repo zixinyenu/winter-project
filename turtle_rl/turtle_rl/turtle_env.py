@@ -51,13 +51,13 @@ class turtle_env(Node):
                     np.float32(tf.transform.translation.x),
                     np.float32(tf.transform.translation.y)
                 ])
-            angles = euler_from_quaternion([
-                tf.transform.rotation.w,
-                tf.transform.rotation.x,
-                tf.transform.rotation.y,
-                tf.transform.rotation.z
-            ])
-            self._turtle_ori = angles[2]
+                angles = euler_from_quaternion([
+                    tf.transform.rotation.w,
+                    tf.transform.rotation.x,
+                    tf.transform.rotation.y,
+                    tf.transform.rotation.z
+                ])
+                self._turtle_ori = angles[2]
         # self.get_logger().info(f'turtle pos: {self._turtle_pos[0]}, {self._turtle_pos[1]}')
         # self.get_logger().info(f'turtle ori: {self._turtle_ori}')
 

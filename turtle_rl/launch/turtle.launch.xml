@@ -30,15 +30,18 @@
             direction="ROS_TO_GZ" />
         <!--########## ROS_to_GZ_Bridge_End ##########-->
 
+        <!--########## Bidirectional_Bridge_Start ##########-->
+        <topic ros_topic_name="/joint_states" gz_topic_name="/joint_states"
+            ros_type_name="sensor_msgs/msg/JointState" gz_type_name="gz.msgs.Model"
+            direction="BIDIRECTIONAL" />
+        <!--########## Bidirectional_Bridge_End ##########-->
+
         <!--########## GZ_to_ROS_Bridge_Start ##########-->
         <topic ros_topic_name="/odom" gz_topic_name="/odom"
             ros_type_name="nav_msgs/msg/Odometry" gz_type_name="gz.msgs.Odometry"
             direction="GZ_TO_ROS" />
         <topic ros_topic_name="/scan" gz_topic_name="/scan"
             ros_type_name="sensor_msgs/msg/LaserScan" gz_type_name="gz.msgs.LaserScan"
-            direction="GZ_TO_ROS" />
-        <topic ros_topic_name="/joint_states" gz_topic_name="/joint_states"
-            ros_type_name="sensor_msgs/msg/JointState" gz_type_name="gz.msgs.Model"
             direction="GZ_TO_ROS" />
         <topic ros_topic_name="/groundtruth_pose" gz_topic_name="/turtlebot3_burger/pose_static"
             ros_type_name="tf2_msgs/msg/TFMessage" gz_type_name="gz.msgs.Pose_V"
