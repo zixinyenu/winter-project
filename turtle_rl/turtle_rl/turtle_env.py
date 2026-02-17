@@ -9,7 +9,7 @@ from tf_transformations import euler_from_quaternion
 import numpy as np
 
 class turtle_env(Node):
-    """TurtleEnv class."""
+    """turtle_env class."""
 
     def __init__(self):
         super().__init__('turtle_env')
