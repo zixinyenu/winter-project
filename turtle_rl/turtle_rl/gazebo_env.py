@@ -23,12 +23,16 @@ class gazebo_env(Node):
             '/world/empty/control',
             callback_group=self._callback_group
         )
+        while not self.control_world_cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info("Waiting for set control world client to be available...")
 
         self.set_entity_pose_cli = self.create_client(
             SetEntityPose,
             '/world/empty/set_pose',
             callback_group=self._callback_group
         )
+        while not self.set_entity_pose_cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info("Waiting for set entity pose client to be available...")
 
         self.spawn_entity_cli = self.create_client(
             SpawnEntity,
@@ -44,21 +48,44 @@ class gazebo_env(Node):
             '/world/empty/remove',
             callback_group=self._callback_group
         )
+        while not self.delete_entity_cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info("Waiting for delete entity client to be available...")
 
         # Services
+        self.control_simulation_ser = self.create_service(
+            Empty,
+            '/control_simulation',
+            callback=self.control_simulation_callback
+        )
         self.set_up_new_episode_ser = self.create_service(
             Empty,
             '/set_up_new_episode',
             callback=self.set_up_new_episode_callback
         )
 
+
         # Non-ROS variables
+        self._simulation_paused = False
         self._worlds_path = "/home/zixin/ws/winter_project/src/turtle_rl/worlds"
         self._square_count = -1
         self._rectangle_count = -1
         self._cylinder_count = -1
         self._goal_pos = [8, 8, 0.0]
         self._episode_num = 0
+
+    async def control_simulation_callback(self, request, response):
+        control_world_request = ControlWorld.Request()
+        if self._simulation_paused:
+            self._simulation_paused = False
+            control_world_request.world_control.pause = False
+            self.get_logger().info("Gazebo simulation has been resumed.")
+        else:
+            self._simulation_paused = True
+            control_world_request.world_control.pause = True
+            self.get_logger().info("Gazebo simulation has been paused.")
+        result = await self.control_world_cli.call_async(control_world_request)
+
+        return response
 
     async def set_up_new_episode_callback(self, request, response):
         episode_num = self._episode_num
