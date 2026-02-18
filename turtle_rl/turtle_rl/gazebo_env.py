@@ -38,6 +38,7 @@ class gazebo_env(Node):
         while not self.spawn_entity_cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("Waiting for spawn entity client to be available...")
 
+        # square: type 2
         self.delete_entity_cli = self.create_client(
             DeleteEntity,
             '/world/empty/remove',
@@ -53,11 +54,14 @@ class gazebo_env(Node):
 
         # Non-ROS variables
         self._worlds_path = "/home/zixin/ws/winter_project/src/turtle_rl/worlds"
+        self._square_count = -1
+        self._rectangle_count = -1
+        self._cylinder_count = -1
 
     async def set_up_new_episode_callback(self, request, response):
         episode_num = 0
 
-        ol, square_list, rl, cy, tp, tg= create_map(randomness=3)
+        ol, square_list, rectangle_list, cylinder_list, tp, tg= create_map(randomness=3)
         world_path = create_new_world(self._worlds_path, episode_num)
 
         square_count = 0
@@ -70,8 +74,36 @@ class gazebo_env(Node):
             request.entity_factory.pose.position.z = 0.5
             request.entity_factory.pose.orientation.z = square[2]
             result = await self.spawn_entity_cli.call_async(request)
-
             square_count += 1
+        self.get_logger().info("Squares all created successfully.")
+        self._square_count = square_count
+
+        rectangle_count = 0
+        for rectangle in rectangle_list:
+            rectangle_path = create_rectangles(rectangle, rectangle_count, world_path)
+            request = SpawnEntity.Request()
+            request.entity_factory.sdf_filename = rectangle_path
+            request.entity_factory.pose.position.x = rectangle[0]
+            request.entity_factory.pose.position.y = rectangle[1]
+            request.entity_factory.pose.position.z = 0.5
+            request.entity_factory.pose.orientation.z = rectangle[2]
+            result = await self.spawn_entity_cli.call_async(request)
+            rectangle_count += 1
+        self.get_logger().info("Rectangles all created successfully.")
+        self._rectangle_count = rectangle_count
+
+        cylinder_count = 0
+        for cylinder in cylinder_list:
+            cylinder_path = create_cylinders(cylinder, cylinder_count, world_path)
+            request = SpawnEntity.Request()
+            request.entity_factory.sdf_filename = cylinder_path
+            request.entity_factory.pose.position.x = cylinder[0]
+            request.entity_factory.pose.position.y = cylinder[1]
+            request.entity_factory.pose.position.z = 0.5
+            result = await self.spawn_entity_cli.call_async(request)
+            cylinder_count += 1
+        self.get_logger().info("Cylinders all created successfully.")
+        self._cylinder_count = cylinder_count
 
         return response
 

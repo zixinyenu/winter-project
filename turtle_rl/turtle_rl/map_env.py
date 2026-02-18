@@ -353,7 +353,7 @@ def create_map(
 
         slim_rectangle_count = 0
         while slim_rectangle_count < slim_rectangle_total:
-            x, y, rad, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 0.8, 0.15, 0.05, True)
+            x, y, rad, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 1.2, 0.15, 0.05, True)
             if not success:
                 continue
             flag = check_collision(obstacle_list, pending_list)
@@ -434,8 +434,8 @@ def create_squares(square_param, square_id, world_dir):
         y = square_param[1]
         oz = square_param[2]
         side = square_param[3]
-        ixx = mass / 12 * (2 * side**2)
-        iyy = mass / 12 * (2 * side**2)
+        ixx = mass / 12 * (side**2 + 1.0**2)
+        iyy = mass / 12 * (side**2 + 1.0**2)
         izz = mass / 12 * (2 * side**2)
         f.writelines([
             "<sdf version='1.12'>\n",
@@ -490,23 +490,135 @@ def create_squares(square_param, square_id, world_dir):
         ])
     return f"{world_dir}/square_{square_id}.sdf"
 
-def create_rectangles(rectangle_list, rectangle_id, world_dir):
+def create_rectangles(rectangle_param, rectangle_id, world_dir):
+    mass = 120
     # rectangle: [x, y, rad, length, width]
-    for rectangle in rectangle_list:
-        with open(f"{world_dir}/rectangle_{rectangle_id}.sdf", "x") as f:
-            f.writelines([
-                "<sdf version='1.12'>\n",
-                "</sdf>\n",
-            ])
+    with open(f"{world_dir}/rectangle_{rectangle_id}.sdf", "x") as f:
+        x = rectangle_param[0]
+        y = rectangle_param[1]
+        oz = rectangle_param[2]
+        length = rectangle_param[3]
+        width = rectangle_param[4]
+        ixx = mass / 12 * (width**2 + 1.0**2)
+        iyy = mass / 12 * (length**2 + 1.0**2)
+        izz = mass / 12 * (length**2 + width**2)
+        f.writelines([
+            "<sdf version='1.12'>\n",
+            f"  <model name='rectangle_{rectangle_id}'>\n",
+            f"    <pose>{x} {y} 0.5 0.0 0.0 {oz}</pose>\n",
+            "    <link name='box_link'>\n",
+            "      <inertial>\n",
+            "        <inertia>\n",
+            f"          <ixx>{ixx}</ixx>\n",
+            "          <ixy>0</ixy>\n",
+            "          <ixz>0</ixz>\n",
+            f"          <iyy>{iyy}</iyy>\n",
+            "          <iyz>0</iyz>\n",
+            f"          <izz>{izz}</izz>\n",
+            "        </inertia>\n",
+            f"        <mass>{mass}</mass>\n",
+            "        <pose>0 0 0 0 0 0</pose>\n",
+            "      </inertial>\n",
+            "      <collision name='box_collision'>\n",
+            "        <geometry>\n",
+            "          <box>\n",
+            f"            <size>{length} {width} 1.0</size>\n",
+            "          </box>\n",
+            "        </geometry>\n",
+            "        <surface>\n",
+            "          <friction>\n",
+            "            <ode/>\n",
+            "          </friction>\n",
+            "          <bounce/>\n",
+            "          <contact/>\n",
+            "        </surface>\n",
+            "      </collision>\n",
+            "      <visual name='box_visual'>\n",
+            "        <geometry>\n",
+            "          <box>\n",
+            f"            <size>{length} {width} 1.0</size>\n",
+            "          </box>\n",
+            "        </geometry>\n",
+            "        <material>\n",
+            "          <ambient>0.300000012 0.300000012 0.300000012 1</ambient>\n",
+            "          <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>\n",
+            "          <specular>1 1 1 1</specular>\n",
+            "        </material>\n",
+            "      </visual>\n",
+            "      <pose>0 0 0 0 0 0</pose>\n",
+            "      <enable_wind>false</enable_wind>\n",
+            "    </link>\n",
+            "    <static>false</static>\n",
+            "    <self_collide>false</self_collide>\n",
+            "  </model>\n",
+            "</sdf>\n",
+        ])
+    return f"{world_dir}/rectangle_{rectangle_id}.sdf"
 
-def create_cylinders(cylinder_list, cylinder_id, world_dir):
+def create_cylinders(cylinder_param, cylinder_id, world_dir):
+    mass = 120
     # cylinder: [x, y, radius]
-    for cylinder in cylinder_list:
-        with open(f"{world_dir}/cylinder_{cylinder_id}.sdf", "x") as f:
-            f.writelines([
-                "<sdf version='1.12'>\n",
-                "</sdf>\n",
-            ])
+    with open(f"{world_dir}/cylinder_{cylinder_id}.sdf", "x") as f:
+        x = cylinder_param[0]
+        y = cylinder_param[1]
+        r = cylinder_param[2]
+        ixx = mass / 12 * (3 * r**2 + 1.0**2)
+        iyy = mass / 12 * (3 * r**2 + 1.0**2)
+        izz = mass / 2 * (r**2)
+        f.writelines([
+            "<sdf version='1.12'>\n",
+            f"  <model name='cylinder_{cylinder_id}'>\n",
+            f"    <pose>{x} {y} 0.5 0.0 0.0 0.0</pose>\n",
+            "    <link name='cylinder_link'>\n",
+            "      <inertial>\n",
+            "        <inertia>\n",
+            f"          <ixx>{ixx}</ixx>\n",
+            "          <ixy>0</ixy>\n",
+            "          <ixz>0</ixz>\n",
+            f"          <iyy>{iyy}</iyy>\n",
+            "          <iyz>0</iyz>\n",
+            f"          <izz>{izz}</izz>\n",
+            "        </inertia>\n",
+            f"        <mass>{mass}</mass>\n",
+            "        <pose>0 0 0 0 0 0</pose>\n",
+            "      </inertial>\n",
+            "      <collision name='cylinder_collision'>\n",
+            "        <geometry>\n",
+            "          <cylinder>\n",
+            f"            <radius>{r}</radius>\n",
+            "            <length>1.0</length>\n",
+            "          </cylinder>\n",
+            "        </geometry>\n",
+            "        <surface>\n",
+            "          <friction>\n",
+            "            <ode/>\n",
+            "          </friction>\n",
+            "          <bounce/>\n",
+            "          <contact/>\n",
+            "        </surface>\n",
+            "      </collision>\n",
+            "      <visual name='cylinder_visual'>\n",
+            "        <geometry>\n",
+            "          <cylinder>\n",
+            f"            <radius>{r}</radius>\n",
+            "            <length>1.0</length>\n",
+            "          </cylinder>\n",
+            "        </geometry>\n",
+            "        <material>\n",
+            "          <ambient>0.300000012 0.300000012 0.300000012 1</ambient>\n",
+            "          <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>\n",
+            "          <specular>1 1 1 1</specular>\n",
+            "        </material>\n",
+            "      </visual>\n",
+            "      <pose>0 0 0 0 0 0</pose>\n",
+            "      <enable_wind>false</enable_wind>\n",
+            "    </link>\n",
+            "    <static>false</static>\n",
+            "    <self_collide>false</self_collide>\n",
+            "  </model>\n",
+            "</sdf>\n",
+        ])
+    return f"{world_dir}/cylinder_{cylinder_id}.sdf"
 
 # package_path = os.path.abspath(os.path.join(
 #     os.getcwd(),
@@ -516,7 +628,7 @@ def create_cylinders(cylinder_list, cylinder_id, world_dir):
 # world_path = create_new_world(worlds_path, world_id=0)
 # create_squares([[1.0, 1.0, 1.57, 0.5]], 0, world_path)
 
-# ol, sl, rl, cy, tp, tg= create_map(randomness=3)
+# ol, sl, rl, cl, tp, tg= create_map(randomness=3)
 # xl = []
 # yl = []
 # for i in range(1201):
