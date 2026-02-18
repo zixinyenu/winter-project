@@ -42,7 +42,6 @@ class gazebo_env(Node):
         while not self.spawn_entity_cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("Waiting for spawn entity client to be available...")
 
-        # square: type 2
         self.delete_entity_cli = self.create_client(
             DeleteEntity,
             '/world/empty/remove',
@@ -62,7 +61,11 @@ class gazebo_env(Node):
             '/set_up_new_episode',
             callback=self.set_up_new_episode_callback
         )
-
+        self.delete_all_obstacles_ser = self.create_service(
+            Empty,
+            '/delete_all_obstacles',
+            callback=self.delete_all_obstacles_callback
+        )
 
         # Non-ROS variables
         self._simulation_paused = False
@@ -93,6 +96,7 @@ class gazebo_env(Node):
 
         ol, square_list, rectangle_list, cylinder_list, start_pos, goal_pos= create_map(randomness=3)
         self._goal_pos = goal_pos
+        self.get_logger().info(f"Goal position set at ({goal_pos[0]}, {goal_pos[1]})")
 
         set_pose_request = SetEntityPose.Request()
         set_pose_request.entity.name = "turtlebot3_burger"
@@ -101,6 +105,7 @@ class gazebo_env(Node):
         set_pose_request.pose.position.z = 1.0
         set_pose_request.pose.orientation.z = start_pos[2]
         result = await self.set_entity_pose_cli.call_async(set_pose_request)
+        self.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
 
         square_count = 0
         for square in square_list:
@@ -142,6 +147,37 @@ class gazebo_env(Node):
             cylinder_count += 1
         self.get_logger().info("Cylinders all created successfully.")
         self._cylinder_count = cylinder_count
+
+        return response
+
+    async def delete_all_obstacles_callback(self, request, response):
+        delete_request = DeleteEntity.Request()
+
+        # square/rectangle: type 2
+        # cylinder: type 2
+        for square_num in range(self._square_count):
+            square_name = f'square_{square_num}'
+            delete_request.entity.name = square_name
+            delete_request.entity.type = 2
+            result = await self.delete_entity_cli.call_async(delete_request)
+        self.get_logger().info("Squares all deleted successfully.")
+        self._square_count = 0
+
+        for rectangle_num in range(self._rectangle_count):
+            rectangle_name = f'rectangle_{rectangle_num}'
+            delete_request.entity.name = rectangle_name
+            delete_request.entity.type = 2
+            result = await self.delete_entity_cli.call_async(delete_request)
+        self.get_logger().info("rectangles all deleted successfully.")
+        self._rectangle_count = 0
+
+        for cylinder_num in range(self._cylinder_count):
+            cylinder_name = f'cylinder_{cylinder_num}'
+            delete_request.entity.name = cylinder_name
+            delete_request.entity.type = 2
+            result = await self.delete_entity_cli.call_async(delete_request)
+        self.get_logger().info("cylinders all deleted successfully.")
+        self._cylinder_count = 0
 
         return response
 
