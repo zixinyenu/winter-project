@@ -57,23 +57,34 @@ class gazebo_env(Node):
         self._square_count = -1
         self._rectangle_count = -1
         self._cylinder_count = -1
+        self._goal_pos = [8, 8, 0.0]
+        self._episode_num = 0
 
     async def set_up_new_episode_callback(self, request, response):
-        episode_num = 0
-
-        ol, square_list, rectangle_list, cylinder_list, tp, tg= create_map(randomness=3)
+        episode_num = self._episode_num
         world_path = create_new_world(self._worlds_path, episode_num)
+
+        ol, square_list, rectangle_list, cylinder_list, start_pos, goal_pos= create_map(randomness=3)
+        self._goal_pos = goal_pos
+
+        set_pose_request = SetEntityPose.Request()
+        set_pose_request.entity.name = "turtlebot3_burger"
+        set_pose_request.pose.position.x = start_pos[0]
+        set_pose_request.pose.position.y = start_pos[1]
+        set_pose_request.pose.position.z = 1.0
+        set_pose_request.pose.orientation.z = start_pos[2]
+        result = await self.set_entity_pose_cli.call_async(set_pose_request)
 
         square_count = 0
         for square in square_list:
             square_path = create_squares(square, square_count, world_path)
-            request = SpawnEntity.Request()
-            request.entity_factory.sdf_filename = square_path
-            request.entity_factory.pose.position.x = square[0]
-            request.entity_factory.pose.position.y = square[1]
-            request.entity_factory.pose.position.z = 0.5
-            request.entity_factory.pose.orientation.z = square[2]
-            result = await self.spawn_entity_cli.call_async(request)
+            spawn_request = SpawnEntity.Request()
+            spawn_request.entity_factory.sdf_filename = square_path
+            spawn_request.entity_factory.pose.position.x = square[0]
+            spawn_request.entity_factory.pose.position.y = square[1]
+            spawn_request.entity_factory.pose.position.z = 0.5
+            spawn_request.entity_factory.pose.orientation.z = square[2]
+            result = await self.spawn_entity_cli.call_async(spawn_request)
             square_count += 1
         self.get_logger().info("Squares all created successfully.")
         self._square_count = square_count
@@ -81,13 +92,13 @@ class gazebo_env(Node):
         rectangle_count = 0
         for rectangle in rectangle_list:
             rectangle_path = create_rectangles(rectangle, rectangle_count, world_path)
-            request = SpawnEntity.Request()
-            request.entity_factory.sdf_filename = rectangle_path
-            request.entity_factory.pose.position.x = rectangle[0]
-            request.entity_factory.pose.position.y = rectangle[1]
-            request.entity_factory.pose.position.z = 0.5
-            request.entity_factory.pose.orientation.z = rectangle[2]
-            result = await self.spawn_entity_cli.call_async(request)
+            spawn_request = SpawnEntity.Request()
+            spawn_request.entity_factory.sdf_filename = rectangle_path
+            spawn_request.entity_factory.pose.position.x = rectangle[0]
+            spawn_request.entity_factory.pose.position.y = rectangle[1]
+            spawn_request.entity_factory.pose.position.z = 0.5
+            spawn_request.entity_factory.pose.orientation.z = rectangle[2]
+            result = await self.spawn_entity_cli.call_async(spawn_request)
             rectangle_count += 1
         self.get_logger().info("Rectangles all created successfully.")
         self._rectangle_count = rectangle_count
@@ -95,12 +106,12 @@ class gazebo_env(Node):
         cylinder_count = 0
         for cylinder in cylinder_list:
             cylinder_path = create_cylinders(cylinder, cylinder_count, world_path)
-            request = SpawnEntity.Request()
-            request.entity_factory.sdf_filename = cylinder_path
-            request.entity_factory.pose.position.x = cylinder[0]
-            request.entity_factory.pose.position.y = cylinder[1]
-            request.entity_factory.pose.position.z = 0.5
-            result = await self.spawn_entity_cli.call_async(request)
+            spawn_request = SpawnEntity.Request()
+            spawn_request.entity_factory.sdf_filename = cylinder_path
+            spawn_request.entity_factory.pose.position.x = cylinder[0]
+            spawn_request.entity_factory.pose.position.y = cylinder[1]
+            spawn_request.entity_factory.pose.position.z = 0.5
+            result = await self.spawn_entity_cli.call_async(spawn_request)
             cylinder_count += 1
         self.get_logger().info("Cylinders all created successfully.")
         self._cylinder_count = cylinder_count
