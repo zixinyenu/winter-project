@@ -168,7 +168,7 @@ class gazebo_env(Node):
             delete_request.entity.name = rectangle_name
             delete_request.entity.type = 2
             result = await self.delete_entity_cli.call_async(delete_request)
-        self.get_logger().info("rectangles all deleted successfully.")
+        self.get_logger().info("Rectangles all deleted successfully.")
         self._rectangle_count = 0
 
         for cylinder_num in range(self._cylinder_count):
@@ -176,7 +176,7 @@ class gazebo_env(Node):
             delete_request.entity.name = cylinder_name
             delete_request.entity.type = 2
             result = await self.delete_entity_cli.call_async(delete_request)
-        self.get_logger().info("cylinders all deleted successfully.")
+        self.get_logger().info("Cylinders all deleted successfully.")
         self._cylinder_count = 0
 
         return response
