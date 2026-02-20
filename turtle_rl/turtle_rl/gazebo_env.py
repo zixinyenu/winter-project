@@ -8,17 +8,17 @@ from .map_env import *
 
 import numpy as np
 
-class gazebo_env(Node):
+class gazebo_env:
     """gazebo_env class."""
 
-    def __init__(self):
-        super().__init__('gazebo_env')
-        self.get_logger().info("The gazebo_env node has just been created.")
+    def __init__(self, node: Node):
+        self.node = node
+        self.node.get_logger().info("The gazebo_env fraction has just been created.")
 
         # Clients
         self._callback_group = MutuallyExclusiveCallbackGroup()
 
-        self.control_world_cli = self.create_client(
+        self.control_world_cli = self.node.create_client(
             ControlWorld,
             '/world/empty/control',
             callback_group=self._callback_group
@@ -26,7 +26,7 @@ class gazebo_env(Node):
         while not self.control_world_cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("Waiting for set control world client to be available...")
 
-        self.set_entity_pose_cli = self.create_client(
+        self.set_entity_pose_cli = self.node.create_client(
             SetEntityPose,
             '/world/empty/set_pose',
             callback_group=self._callback_group
@@ -34,7 +34,7 @@ class gazebo_env(Node):
         while not self.set_entity_pose_cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("Waiting for set entity pose client to be available...")
 
-        self.spawn_entity_cli = self.create_client(
+        self.spawn_entity_cli = self.node.create_client(
             SpawnEntity,
             '/world/empty/create',
             callback_group=self._callback_group
@@ -42,7 +42,7 @@ class gazebo_env(Node):
         while not self.spawn_entity_cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("Waiting for spawn entity client to be available...")
 
-        self.delete_entity_cli = self.create_client(
+        self.delete_entity_cli = self.node.create_client(
             DeleteEntity,
             '/world/empty/remove',
             callback_group=self._callback_group
@@ -51,17 +51,17 @@ class gazebo_env(Node):
             self.get_logger().info("Waiting for delete entity client to be available...")
 
         # Services
-        self.control_simulation_ser = self.create_service(
+        self.control_simulation_ser = self.node.create_service(
             Empty,
             '/control_simulation',
             callback=self.control_simulation_callback
         )
-        self.set_up_new_episode_ser = self.create_service(
+        self.set_up_new_episode_ser = self.node.create_service(
             Empty,
             '/set_up_new_episode',
             callback=self.set_up_new_episode_callback
         )
-        self.delete_all_obstacles_ser = self.create_service(
+        self.delete_all_obstacles_ser = self.node.create_service(
             Empty,
             '/delete_all_obstacles',
             callback=self.delete_all_obstacles_callback
@@ -81,11 +81,11 @@ class gazebo_env(Node):
         if self._simulation_paused:
             self._simulation_paused = False
             control_world_request.world_control.pause = False
-            self.get_logger().info("Gazebo simulation has been resumed.")
+            self.node.get_logger().info("Gazebo simulation has been resumed.")
         else:
             self._simulation_paused = True
             control_world_request.world_control.pause = True
-            self.get_logger().info("Gazebo simulation has been paused.")
+            self.node.get_logger().info("Gazebo simulation has been paused.")
         result = await self.control_world_cli.call_async(control_world_request)
 
         return response
@@ -96,7 +96,7 @@ class gazebo_env(Node):
 
         ol, square_list, rectangle_list, cylinder_list, start_pos, goal_pos= create_map(randomness=3)
         self._goal_pos = goal_pos
-        self.get_logger().info(f"Goal position set at ({goal_pos[0]}, {goal_pos[1]})")
+        self.node.get_logger().info(f"Goal position set at ({goal_pos[0]}, {goal_pos[1]})")
 
         set_pose_request = SetEntityPose.Request()
         set_pose_request.entity.name = "turtlebot3_burger"
@@ -105,7 +105,7 @@ class gazebo_env(Node):
         set_pose_request.pose.position.z = 0.08
         set_pose_request.pose.orientation.z = start_pos[2]
         result = await self.set_entity_pose_cli.call_async(set_pose_request)
-        self.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
+        self.node.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
 
         square_count = 0
         for square in square_list:
@@ -118,7 +118,7 @@ class gazebo_env(Node):
             spawn_request.entity_factory.pose.orientation.z = square[2]
             result = await self.spawn_entity_cli.call_async(spawn_request)
             square_count += 1
-        self.get_logger().info("Squares all created successfully.")
+        self.node.get_logger().info("Squares all created successfully.")
         self._square_count = square_count
 
         rectangle_count = 0
@@ -132,7 +132,7 @@ class gazebo_env(Node):
             spawn_request.entity_factory.pose.orientation.z = rectangle[2]
             result = await self.spawn_entity_cli.call_async(spawn_request)
             rectangle_count += 1
-        self.get_logger().info("Rectangles all created successfully.")
+        self.node.get_logger().info("Rectangles all created successfully.")
         self._rectangle_count = rectangle_count
 
         cylinder_count = 0
@@ -145,7 +145,7 @@ class gazebo_env(Node):
             spawn_request.entity_factory.pose.position.z = 0.5
             result = await self.spawn_entity_cli.call_async(spawn_request)
             cylinder_count += 1
-        self.get_logger().info("Cylinders all created successfully.")
+        self.node.get_logger().info("Cylinders all created successfully.")
         self._cylinder_count = cylinder_count
 
         return response
@@ -160,7 +160,7 @@ class gazebo_env(Node):
             delete_request.entity.name = square_name
             delete_request.entity.type = 2
             result = await self.delete_entity_cli.call_async(delete_request)
-        self.get_logger().info("Squares all deleted successfully.")
+        self.node.get_logger().info("Squares all deleted successfully.")
         self._square_count = 0
 
         for rectangle_num in range(self._rectangle_count):
@@ -168,7 +168,7 @@ class gazebo_env(Node):
             delete_request.entity.name = rectangle_name
             delete_request.entity.type = 2
             result = await self.delete_entity_cli.call_async(delete_request)
-        self.get_logger().info("Rectangles all deleted successfully.")
+        self.node.get_logger().info("Rectangles all deleted successfully.")
         self._rectangle_count = 0
 
         for cylinder_num in range(self._cylinder_count):
@@ -176,19 +176,19 @@ class gazebo_env(Node):
             delete_request.entity.name = cylinder_name
             delete_request.entity.type = 2
             result = await self.delete_entity_cli.call_async(delete_request)
-        self.get_logger().info("Cylinders all deleted successfully.")
+        self.node.get_logger().info("Cylinders all deleted successfully.")
         self._cylinder_count = 0
 
         return response
 
 
-def main(args=None):
-    rclpy.init(args=args)
-    gazebo_env_node = gazebo_env()
-    rclpy.spin(gazebo_env_node)
-    gazebo_env_node.destroy_node()
-    rclpy.shutdown()
+# def main(args=None):
+#     rclpy.init(args=args)
+#     gazebo_env_node = gazebo_env()
+#     rclpy.spin(gazebo_env_node)
+#     gazebo_env_node.destroy_node()
+#     rclpy.shutdown()
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()

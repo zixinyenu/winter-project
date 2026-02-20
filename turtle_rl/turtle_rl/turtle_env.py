@@ -8,21 +8,21 @@ from tf_transformations import euler_from_quaternion
 
 import numpy as np
 
-class turtle_env(Node):
+class turtle_env:
     """turtle_env class."""
 
-    def __init__(self):
-        super().__init__('turtle_env')
-        self.get_logger().info("The turtle_env node has just been created.")
+    def __init__(self, node: Node):
+        self.node = node
+        self.node.get_logger().info("The turtle_env fraction has just been created.")
 
         # Parameter
 
         # Subscription
-        self.laser_sub = self.create_subscription(LaserScan, 'scan', self.laser_callback, 1)
-        self.turtle_pos_sub = self.create_subscription(TFMessage, '/groundtruth_pose', self.turtle_pos_callback, 1)
+        self.laser_sub = self.node.create_subscription(LaserScan, 'scan', self.laser_callback, 1)
+        self.turtle_pos_sub = self.node.create_subscription(TFMessage, '/groundtruth_pose', self.turtle_pos_callback, 1)
 
         # Publisher
-        self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.cmd_vel_pub = self.node.create_publisher(Twist, '/cmd_vel', 10)
 
         # Class variables
         self._laser_readings = np.array([np.float32(10)]*360) # LSD-02 can ony detect up to 8m, so 10m for inf
@@ -58,17 +58,17 @@ class turtle_env(Node):
                     tf.transform.rotation.z
                 ])
                 self._turtle_ori = angles[2]
-        # self.get_logger().info(f'turtle pos: {self._turtle_pos[0]}, {self._turtle_pos[1]}')
-        # self.get_logger().info(f'turtle ori: {self._turtle_ori}')
+        # self.node.get_logger().info(f'turtle pos: {self._turtle_pos[0]}, {self._turtle_pos[1]}')
+        # self.node.get_logger().info(f'turtle ori: {self._turtle_ori}')
 
 
-def main(args=None):
-    rclpy.init(args=args)
-    turtle_env_node = turtle_env()
-    rclpy.spin(turtle_env_node)
-    turtle_env_node.destroy_node()
-    rclpy.shutdown()
+# def main(args=None):
+#     rclpy.init(args=args)
+#     turtle_env_node = turtle_env()
+#     rclpy.spin(turtle_env_node)
+#     turtle_env_node.destroy_node()
+#     rclpy.shutdown()
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
