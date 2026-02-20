@@ -70,14 +70,17 @@ class turtle_env:
     def timer_callback(self):
         if self._prev_fence_contact_count != self._curr_fence_contact_count:
             self._out_of_bound_penalty = True
+            self.node.get_logger().info(f"Apply out-of-bound penalty: {self._out_of_bound_penalty}")
             self._prev_fence_contact_count = self._curr_fence_contact_count
         else:
             self._out_of_bound_penalty = False
 
         if self._prev_obstacle_contact_count != self._curr_obstacle_contact_count:
             self._obstacle_hit_penalty = True
-        else:
+            self.node.get_logger().info(f"Apply obstacle-hit penalty: {self._obstacle_hit_penalty}")
             self._prev_obstacle_contact_count = self._curr_obstacle_contact_count
+        else:
+            self._obstacle_hit_penalty = False
 
     def fence_contact_callback(self, msg: Bool):
         if msg.data is True:
