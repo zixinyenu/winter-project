@@ -18,7 +18,7 @@
         <!--Set to unfeasible values. Will be overridden upon the setting-up of first episode.-->
         <param name="x" value="-8.0"/>
         <param name="y" value="-8.0"/>
-        <param name="z" value="1.0"/>
+        <param name="z" value="0.08"/>
         <param name="R" value="0.0"/>
         <param name="P" value="0.0"/>
         <param name="Y" value="0.0"/>
@@ -50,6 +50,9 @@
         <topic ros_topic_name="/fence/touched" gz_topic_name="/fence/touched"
             ros_type_name="std_msgs/msg/Bool" gz_type_name="gz.msgs.Boolean"
             direction="GZ_TO_ROS" />
+        <topic ros_topic_name="/obstacle/touched" gz_topic_name="/obstacle/touched"
+            ros_type_name="std_msgs/msg/Bool" gz_type_name="gz.msgs.Boolean"
+            direction="GZ_TO_ROS" />
         <!--########## GZ_to_ROS_Bridge_End ##########-->
 
         <!--########## Service_Bridge_Start ##########-->
@@ -68,8 +71,8 @@
         <!--########## Service_Bridge_End ##########-->
     </ros_gz_bridge>
 
-    <!--
+
     <node pkg="turtle_rl" exec="moveTest" name="moveTest" />
-    -->
+
 
 </launch>

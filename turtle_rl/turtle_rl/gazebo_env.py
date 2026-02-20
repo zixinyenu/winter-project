@@ -102,7 +102,7 @@ class gazebo_env(Node):
         set_pose_request.entity.name = "turtlebot3_burger"
         set_pose_request.pose.position.x = start_pos[0]
         set_pose_request.pose.position.y = start_pos[1]
-        set_pose_request.pose.position.z = 1.0
+        set_pose_request.pose.position.z = 0.08
         set_pose_request.pose.orientation.z = start_pos[2]
         result = await self.set_entity_pose_cli.call_async(set_pose_request)
         self.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")

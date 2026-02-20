@@ -67,8 +67,20 @@
       <self_collide>false</self_collide>
     </model>
     <model name='fence_1'>
+      <plugin filename="gz-sim-touchplugin-system"
+              name="gz::sim::systems::TouchPlugin">
+          <target>turtlebot3_burger</target>
+          <namespace>fence</namespace>
+          <time>0.001</time>
+          <enabled>true</enabled>
+      </plugin>
       <pose>-6.1000001226378675 -1.0994676924413233e-07 0.49999932681900072 -1.9602143549339623e-08 -2.4822068816099727e-09 4.907735144525877e-08</pose>
       <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>
+            <contact>
+                <collision>box_collision</collision>
+            </contact>
+        </sensor>
         <inertial>
           <inertia>
             <ixx>16.666</ixx>
@@ -173,8 +185,20 @@
       <self_collide>false</self_collide>
     </model>
     <model name='fence_3'>
+      <plugin filename="gz-sim-touchplugin-system"
+              name="gz::sim::systems::TouchPlugin">
+          <target>turtlebot3_burger</target>
+          <namespace>fence</namespace>
+          <time>0.001</time>
+          <enabled>true</enabled>
+      </plugin>
       <pose>-1.2624896680003741e-07 6.0999999496722941 0.49999892895764775 -6.8684635263476807e-09 8.8765153466269893e-08 -8.9611825445029425e-09</pose>
       <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>
+            <contact>
+                <collision>box_collision</collision>
+            </contact>
+        </sensor>
         <inertial>
           <inertia>
             <ixx>16.666</ixx>
@@ -220,8 +244,20 @@
       <self_collide>false</self_collide>
     </model>
     <model name='fence_4'>
+      <plugin filename="gz-sim-touchplugin-system"
+              name="gz::sim::systems::TouchPlugin">
+          <target>turtlebot3_burger</target>
+          <namespace>fence</namespace>
+          <time>0.001</time>
+          <enabled>true</enabled>
+      </plugin>
       <pose>3.1165417824908246e-07 -6.1000000131049177 0.49999908319707276 -4.6068191654925905e-09 -6.3004293022832624e-08 2.8392683620853e-09</pose>
       <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>
+            <contact>
+                <collision>box_collision</collision>
+            </contact>
+        </sensor>
         <inertial>
           <inertia>
             <ixx>16.666</ixx>

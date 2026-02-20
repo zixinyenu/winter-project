@@ -38,7 +38,7 @@ class moveTest(Node):
 
     def twist_callback(self):
         """Publish velocity command to the robot."""
-        x_vel = self._x_vel
+        x_vel = -self._x_vel
         twist = self.get_twist([x_vel, 0.0, 0.0], [0.0, 0.0, 0.0])
         self.twist_publisher_.publish(twist)
 

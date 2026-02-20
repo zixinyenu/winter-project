@@ -7,6 +7,8 @@ class simplified_env(gym.Env):
 
     def __init__(self):
         super().__init__()
+
+
         # Action space: a discrete space for this simplified environment
         # [GO_NORTH, GO_SOUTH, GO_EAST, GO_WEST] for a unit velocity
         self.action_space = spaces.Discrete(n=4)
