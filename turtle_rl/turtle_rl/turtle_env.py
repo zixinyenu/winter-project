@@ -1,3 +1,4 @@
+import numpy as np
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
@@ -6,8 +7,6 @@ from sensor_msgs.msg import LaserScan
 from tf2_msgs.msg import TFMessage
 
 from tf_transformations import euler_from_quaternion
-
-import numpy as np
 
 class turtle_env:
     """turtle_env class."""
@@ -51,7 +50,7 @@ class turtle_env:
         self.cmd_vel_pub = self.node.create_publisher(Twist, '/cmd_vel', 10)
 
         # Timer
-        self.main_timer =  self.node.create_timer(
+        self.contact_timer =  self.node.create_timer(
             1/self.fre_,
             self.timer_callback
         )

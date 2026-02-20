@@ -54,7 +54,7 @@ setup(
     entry_points={
         'console_scripts': [
             'moveTest = turtle_rl.moveTest:main',
-            'interface = turtle_rl.ros_gz_interface:main',
+            'simplified_environment = turtle_rl.simplified_env:main',
         ],
     },
 )

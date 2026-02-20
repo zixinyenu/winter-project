@@ -6,8 +6,6 @@ from ros_gz_interfaces.srv import ControlWorld, SetEntityPose, SpawnEntity, Dele
 
 from .map_env import *
 
-import numpy as np
-
 class gazebo_env:
     """gazebo_env class."""
 
@@ -74,7 +72,7 @@ class gazebo_env:
         self._square_count = -1
         self._rectangle_count = -1
         self._cylinder_count = -1
-        self._goal_pos = [8, 8, 0.0]
+        self._goal_pos = [0, 0]
         self._episode_num = 0
 
     async def control_simulation_callback(self, request, response):
