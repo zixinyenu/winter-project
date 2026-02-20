@@ -90,7 +90,7 @@
             <iyz>0</iyz>
             <izz>16.666</izz>
           </inertia>
-          <mass>100</mass>
+          <mass>10</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='box_collision'>
@@ -149,7 +149,7 @@
             <iyz>0</iyz>
             <izz>16.666</izz>
           </inertia>
-          <mass>100</mass>
+          <mass>10</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='box_collision'>
@@ -208,7 +208,7 @@
             <iyz>0</iyz>
             <izz>16.666</izz>
           </inertia>
-          <mass>100</mass>
+          <mass>10</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='box_collision'>
@@ -267,7 +267,7 @@
             <iyz>0</iyz>
             <izz>16.666</izz>
           </inertia>
-          <mass>100</mass>
+          <mass>10</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='box_collision'>
