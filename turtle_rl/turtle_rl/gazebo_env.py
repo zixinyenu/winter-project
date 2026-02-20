@@ -12,6 +12,7 @@ class gazebo_env:
     """gazebo_env class."""
 
     def __init__(self, node: Node):
+        # super().__init__('gazebo_env')
         self.node = node
         self.node.get_logger().info("The gazebo_env fraction has just been created.")
 
@@ -24,7 +25,7 @@ class gazebo_env:
             callback_group=self._callback_group
         )
         while not self.control_world_cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for set control world client to be available...")
+            self.node.get_logger().info("Waiting for set control world client to be available...")
 
         self.set_entity_pose_cli = self.node.create_client(
             SetEntityPose,
