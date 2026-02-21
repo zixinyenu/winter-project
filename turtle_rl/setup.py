@@ -37,6 +37,7 @@ setup(
         ('share/' + package_name, ['urdf/turtlebot3_burger.gazebo.xacro']),
         ('share/' + package_name, ['launch/turtle_rviz.launch.xml']),
         ('share/' + package_name, ['launch/turtle.launch.xml']),
+        ('share/' + package_name, ['launch/start_training.launch.xml']),
         *recursive_files('share/' + package_name, 'meshes'),
         *recursive_files('share/' + package_name, 'worlds'),
     ],
@@ -55,6 +56,7 @@ setup(
         'console_scripts': [
             'moveTest = turtle_rl.moveTest:main',
             'simplified_environment = turtle_rl.simplified_env:main',
+            'training_node = turtle_rl.training_node:main',
         ],
     },
 )

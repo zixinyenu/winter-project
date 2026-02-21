@@ -10,11 +10,12 @@ from .ros_gz_interface import *
 class simplified_env(gym.Env, Node):
     """Custom Environment that follows gym interface."""
 
-    def __init__(self, tolerence):
+    def __init__(self):
         super().__init__('simplified_env')
         self.get_logger().info("The simplified_env node has just been created.")
         self.ros_gz_interface = ros_gz_interface(self)
-        self._tolerence = tolerence
+        # TODO Make it a ROS parameter
+        self._tolerence = 0.25
         self._max_translational_velocity = np.float32(0.22)
         self._max_rotational_vel = np.float32(2.84)
         self._min_detection_distance = np.float32(0.16)

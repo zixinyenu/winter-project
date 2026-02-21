@@ -56,7 +56,7 @@ class turtle_env:
         )
 
         # Class variables
-        self._laser_readings = np.array([np.float32(10)]*360) # LSD-02 can ony detect up to 8m, so 10m for inf
+        self._laser_readings = np.array([np.float32(9)]*360) # LSD-02 can ony detect up to 8m, so 9m for inf
         self._turtle_pos = np.array([np.float32(0), np.float32(0)])
         self._turtle_ori = np.float32(0)
         self._prev_fence_contact_count = 0
@@ -95,8 +95,8 @@ class turtle_env:
 
     def laser_callback(self, msg: LaserScan):
         laser_reading = np.array(msg.ranges)
-        # Convert infinity to 10m, since LSD-02 can only detect up to 8m
-        laser_reading[laser_reading == np.inf] = np.float32(10)
+        # Convert infinity to 9m, since LSD-02 can only detect up to 8m
+        laser_reading[laser_reading == np.inf] = np.float32(9)
         self._laser_readings = laser_reading
 
     def turtle_pos_callback(self, msg: TFMessage):
