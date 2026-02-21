@@ -15,11 +15,31 @@ class simplified_env(gym.Env, Node):
         self.get_logger().info("The simplified_env node has just been created.")
         self.ros_gz_interface = ros_gz_interface(self)
         self._tolerence = tolerence
+        self._max_translational_velocity = np.float32(0.22)
+        self._max_rotational_vel = np.float32(2.84)
+        self._min_detection_distance = np.float32(0.16)
+        self._max_detection_distance = np.float32(8.0) # Not used
 
         # Action space: 
-        self.action_space = spaces.Box()
+        self.action_space = spaces.Box(
+            low=np.array([0, -self._max_rotational_vel]),
+            high=np.array([self._max_translational_velocity, self._max_rotational_vel]),
+            dtype=np.float32
+        )
         # Observation space: 
-        self.observation_space = spaces.Box()
+        obs_low = np.append(
+            np.array([self._min_detection_distance]*360),
+            np.array([np.float32(0), np.float32(-np.pi)])
+        )
+        obs_high = np.append(
+            np.array([np.float32(9)]*360),
+            np.array([np.float32(8.4853), np.float32(np.pi)])
+        ) # (6**2 + 6**2)**0.5 = 8.4853
+        self.observation_space = spaces.Box(
+            low=obs_low,
+            high=obs_high,
+            dtype=np.float32
+        )
 
         # Clients
         self._se_callback_group = MutuallyExclusiveCallbackGroup()
@@ -55,7 +75,7 @@ class simplified_env(gym.Env, Node):
         self._episode_count = 0
         self._step_count = 0
 
-        self.laser_observation = np.array([np.float32(10)]*360)
+        self.laser_observation = np.array([np.float32(9)]*360)
         self.location_observation = np.array([0.0, 0.0])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
@@ -92,7 +112,7 @@ class simplified_env(gym.Env, Node):
 
         self._step_count = 0
 
-        self.laser_observation = np.array([np.float32(10)]*360)
+        self.laser_observation = np.array([np.float32(9)]*360)
         self.location_observation = np.array([0.0, 0.0])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
