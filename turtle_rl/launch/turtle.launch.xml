@@ -18,7 +18,7 @@
         <!--Set to unfeasible values. Will be overridden upon the setting-up of first episode.-->
         <param name="x" value="-8.0"/>
         <param name="y" value="-8.0"/>
-        <param name="z" value="0.08"/>
+        <param name="z" value="0.0"/>
         <param name="R" value="0.0"/>
         <param name="P" value="0.0"/>
         <param name="Y" value="0.0"/>

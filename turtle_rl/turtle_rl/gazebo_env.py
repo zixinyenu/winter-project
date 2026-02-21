@@ -31,7 +31,7 @@ class gazebo_env:
             callback_group=self._callback_group
         )
         while not self.set_entity_pose_cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for set entity pose client to be available...")
+            self.node.get_logger().info("Waiting for set entity pose client to be available...")
 
         self.spawn_entity_cli = self.node.create_client(
             SpawnEntity,
@@ -39,7 +39,7 @@ class gazebo_env:
             callback_group=self._callback_group
         )
         while not self.spawn_entity_cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for spawn entity client to be available...")
+            self.node.get_logger().info("Waiting for spawn entity client to be available...")
 
         self.delete_entity_cli = self.node.create_client(
             DeleteEntity,
@@ -47,7 +47,7 @@ class gazebo_env:
             callback_group=self._callback_group
         )
         while not self.delete_entity_cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for delete entity client to be available...")
+            self.node.get_logger().info("Waiting for delete entity client to be available...")
 
         # Services
         self.control_simulation_ser = self.node.create_service(
@@ -69,11 +69,14 @@ class gazebo_env:
         # Non-ROS variables
         self._simulation_paused = False
         self._worlds_path = "/home/zixin/ws/winter_project/src/turtle_rl/worlds"
-        self._square_count = -1
-        self._rectangle_count = -1
-        self._cylinder_count = -1
+        self._square_count = 0
+        self._rectangle_count = 0
+        self._cylinder_count = 0
         self._goal_pos = [0, 0]
         self._episode_num = 0
+
+    def episode_num_setter(self, episode_num):
+        self._episode_num = episode_num
 
     async def control_simulation_callback(self, request, response):
         control_world_request = ControlWorld.Request()
@@ -101,7 +104,7 @@ class gazebo_env:
         set_pose_request.entity.name = "turtlebot3_burger"
         set_pose_request.pose.position.x = start_pos[0]
         set_pose_request.pose.position.y = start_pos[1]
-        set_pose_request.pose.position.z = 0.08
+        set_pose_request.pose.position.z = 0.0
         set_pose_request.pose.orientation.z = start_pos[2]
         result = await self.set_entity_pose_cli.call_async(set_pose_request)
         self.node.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")

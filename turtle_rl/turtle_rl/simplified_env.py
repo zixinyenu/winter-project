@@ -51,18 +51,75 @@ class simplified_env(gym.Env, Node):
         self._step_count = 0
         self._episode_count = 0
 
+        self.done = False
+
+        self.laser_observation = np.array([np.float32(10)]*360)
+        self.location_observation = np.array([0.0, 0.0])
+        self.observation = np.append(self.laser_observation, self.location_observation)
+
     def step(self, action):
         pass
+        # return observation, reward, terminated, truncated, info
 
-    def reset(self, seed=None, options=None):
-        pass
-        # return observation, info
+    async def reset(self, seed=None, options=None):
+        # Reset RL variables
+        self.done = False
+        self.laser_observation = np.array([np.float32(10)]*360)
+        self.location_observation = np.array([0.0, 0.0])
+        self.observation = np.append(self.laser_observation, self.location_observation)
+
+        # Pause the simulation
+        pause_request = Empty.Request()
+        result = await self.control_simulation_cli(pause_request)
+
+        # Re-initialize ros_gz_interface
+        self.ros_gz_interface = ros_gz_interface(self)
+
+        # Delete all obstacles in the scene
+        delete_request = Empty.Request()
+        result = await self.delete_all_obstacles_cli(delete_request)
+
+        # Spawn all obstacles and move the turtlebot to its start pose
+        self.ros_gz_interface.set_episode_num(self._episode_count)
+        set_request = Empty.Request()
+        result = await self.set_up_new_episode_cli(set_request)
+
+        # Resume the simulation
+        resume_request = Empty.Request()
+        result = await self.control_simulation_cli(resume_request)
+
+        # Spin once
+        self.spin()
+
+        # Get observation and info
+        observation = self.get_observation()
+        info = self.get_info()
+
+        # Increment critical value
+        self._episode_count += 1
+
+        return observation, info
 
     def render(self):
         pass
 
     def close(self):
         pass
+
+    def spin(self):
+        rclpy.spin_once(self)
+
+    def get_observation(self):
+        self.laser_observation = self.ros_gz_interface.get_laser_readings()
+        self.location_observation = self.ros_gz_interface.get_distance_and_bearing()
+        self.observation = np.append(self.laser_observation, self.location_observation)
+        return self.observation
+
+    def get_info(self):
+        return {
+            "distance": self.location_observation[0],
+            "bearing": self.location_observation[1]
+        }
 
 def main(args=None):
     rclpy.init(args=args)

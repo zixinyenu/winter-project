@@ -41,6 +41,9 @@ class ros_gz_interface:
         return self.turtle_environment._obstacle_hit_penalty
     ########## ROS_Functions_End ##########
 
+    def set_episode_num(self, episode_num):
+        self.gazebo_environment.episode_num_setter(episode_num)
+
     def timer_callback(self):
         self.distance, self.bearing = self._get_distance_and_bearing()
         # self.node.get_logger().info(f"Turtlebot->Goal    distance: {self.distance}, bearing: {self.bearing}")
