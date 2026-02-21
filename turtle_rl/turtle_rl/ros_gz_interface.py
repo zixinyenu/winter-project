@@ -21,8 +21,8 @@ class ros_gz_interface:
         )
 
         # Non-ROS variables
-        self.distance = 0
-        self.bearing = 0
+        self.distance = np.float32(0)
+        self.bearing = np.float32(0)
 
     ########## ROS_Functions_Start ##########
     # action = [linear_x, angular_z]
@@ -64,7 +64,7 @@ class ros_gz_interface:
             turtle_y - goal_y,
             turtle_x - goal_x
         )
-        return distance, bearing
+        return np.float32(distance), np.float32(bearing)
     ########## Helper_Functions_End ##########
 
 # def main(args=None):

@@ -71,6 +71,4 @@
         <!--########## Service_Bridge_End ##########-->
     </ros_gz_bridge>
 
-    <node pkg="turtle_rl" exec="training_node" name="training_node" />
-
 </launch>

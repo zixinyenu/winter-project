@@ -84,8 +84,10 @@ class simplified_env(gym.Env, Node):
         # Increment step count
         self._step_count += 1
 
-        # Publish an aciton (twist)
-        self.ros_gz_interface.publish_twist(action)
+        # Publish an aciton, action = [linear_x, angular_z]
+        linear_x = action[0]
+        linear_y = action[1]
+        self.ros_gz_interface.publish_twist([float(linear_x), float(linear_y)])
 
         # Spin once
         self.spin()
@@ -106,7 +108,7 @@ class simplified_env(gym.Env, Node):
 
         return observation, reward, terminated, truncated, info
 
-    async def reset(self, seed=None, options=None):
+    def reset(self, seed=None, options=None):
         # Reset RL variables
         self.done = False
         self.truncated = False
@@ -118,24 +120,24 @@ class simplified_env(gym.Env, Node):
         self.observation = np.append(self.laser_observation, self.location_observation)
 
         # Pause the simulation
-        pause_request = Empty.Request()
-        result = await self.control_simulation_cli(pause_request)
+        # pause_request = Empty.Request()
+        # result = await self.control_simulation_cli(pause_request)
 
         # Re-initialize ros_gz_interface
         self.ros_gz_interface = ros_gz_interface(self)
 
         # Delete all obstacles in the scene
-        delete_request = Empty.Request()
-        result = await self.delete_all_obstacles_cli(delete_request)
+        # delete_request = Empty.Request()
+        # result = await self.delete_all_obstacles_cli(delete_request)
 
         # Spawn all obstacles and move the turtlebot to its start pose
         self.ros_gz_interface.set_episode_num(self._episode_count)
-        set_request = Empty.Request()
-        result = await self.set_up_new_episode_cli(set_request)
+        # set_request = Empty.Request()
+        # result = await self.set_up_new_episode_cli(set_request)
 
         # Resume the simulation
-        resume_request = Empty.Request()
-        result = await self.control_simulation_cli(resume_request)
+        # resume_request = Empty.Request()
+        # result = await self.control_simulation_cli(resume_request)
 
         # Spin once
         self.spin()

@@ -1,6 +1,7 @@
 import numpy as np
 import rclpy
 from rclpy.node import Node
+from rclpy.exceptions import ParameterAlreadyDeclaredException
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
 from sensor_msgs.msg import LaserScan
@@ -17,7 +18,10 @@ class turtle_env:
         self.node.get_logger().info("The turtle_env fraction has just been created.")
 
         # Parameter
-        self.node.declare_parameter('frequency', 100)
+        try:
+            self.node.declare_parameter('frequency', 100)
+        except ParameterAlreadyDeclaredException:
+            self.node.get_logger().info("Parameter \"frequency\" has already been declared in previous step.")
         self.fre_ = self.node.get_parameter('frequency').value
 
         # Subscription

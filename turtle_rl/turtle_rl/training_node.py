@@ -18,7 +18,7 @@ class training_node(Node):
 
         # Parameters
 
-async def main(args=None):
+def main(args=None):
     # Initialize training node
     rclpy.init()
     node = training_node()
@@ -45,7 +45,7 @@ async def main(args=None):
     # Make custom environment
     env = gym.make("Simplified-V0")
     env = Monitor(env)
-    await env.reset()
+    env.reset()
     node.get_logger().info("\n Initial reset. \n")
 
     # Check custom environment to see if it is fine
@@ -53,18 +53,18 @@ async def main(args=None):
     # node.get_logger().info("The simplified_env has been checked.")
 
     # Create callbacks needed for training
-    stop_callback = callbacks.StopTrainingOnRewardThreshold(reward_threshold=1500, verbose=1)
-    eval_callback = callbacks.EvalCallback(
-        eval_env=env,
-        callback_on_new_best=stop_callback,
-        eval_freq=100000,
-        best_model_save_path=models_dir,
-        n_eval_episodes=50
-    )
+    # stop_callback = callbacks.StopTrainingOnRewardThreshold(reward_threshold=1500, verbose=1)
+    # eval_callback = callbacks.EvalCallback(
+    #     eval_env=env,
+    #     callback_on_new_best=stop_callback,
+    #     eval_freq=100000,
+    #     best_model_save_path=models_dir,
+    #     n_eval_episodes=50
+    # )
 
     # Training!
     model = PPO(
-        policy="MultiInputPolicy",
+        policy="MlpPolicy",
         env=env,
         verbose=1,
         tensorboard_log=logs_dir,
@@ -77,16 +77,24 @@ async def main(args=None):
         clip_range=0.2
     )
     try:
-        model.learn(
-            total_timesteps=int(50000000),
-            reset_num_timesteps=False,
-            callback=eval_callback,
-            tb_log_name=f"{algorithm}"
-        )
+        # model.learn(
+        #     total_timesteps=int(50000000),
+        #     reset_num_timesteps=False,
+        #     callback=eval_callback,
+        #     tb_log_name=f"{algorithm}"
+        # )
+        TIMESTEPS = 1000
+        for i in range(1, 30):
+            model.learn(
+                total_timesteps=TIMESTEPS,
+                reset_num_timesteps=False,
+                tb_log_name=algorithm
+            )
+        model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
     except KeyboardInterrupt:
-        model.save(f"{models_dir}/{algorithm}")
+        model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
     # Save the trained model
-    model.save(f"{models_dir}/{algorithm}")
+    # model.save(f"{models_dir}/{algorithm}")
 
 if __name__ == "__main__":
     main()
