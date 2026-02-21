@@ -10,10 +10,11 @@ from .ros_gz_interface import *
 class simplified_env(gym.Env, Node):
     """Custom Environment that follows gym interface."""
 
-    def __init__(self):
+    def __init__(self, tolerence):
         super().__init__('simplified_env')
         self.get_logger().info("The simplified_env node has just been created.")
         self.ros_gz_interface = ros_gz_interface(self)
+        self._tolerence = tolerence
 
         # Action space: 
         self.action_space = spaces.Box()
@@ -48,22 +49,49 @@ class simplified_env(gym.Env, Node):
             self.get_logger().info("Waiting for delete all obstacles client to be available...")
 
         # RL variables
-        self._step_count = 0
-        self._episode_count = 0
-
         self.done = False
+        self.truncated = False
+
+        self._episode_count = 0
+        self._step_count = 0
 
         self.laser_observation = np.array([np.float32(10)]*360)
         self.location_observation = np.array([0.0, 0.0])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
     def step(self, action):
-        pass
-        # return observation, reward, terminated, truncated, info
+        # Increment step count
+        self._step_count += 1
+
+        # Publish an aciton (twist)
+        self.ros_gz_interface.publish_twist(action)
+
+        # Spin once
+        self.spin()
+
+        # Get observation and info
+        observation = self.get_observation()
+        info = self.get_info()
+
+        # Get the reward
+        reward = self.compute_rewards(info)
+
+        # Check if the turtlebot reaches the goal with a tolerence
+        self.done = (info["distance"] < self._tolerence)
+        terminated = self.done
+
+        # truncated is also False
+        truncated = self.truncated
+
+        return observation, reward, terminated, truncated, info
 
     async def reset(self, seed=None, options=None):
         # Reset RL variables
         self.done = False
+        self.truncated = False
+
+        self._step_count = 0
+
         self.laser_observation = np.array([np.float32(10)]*360)
         self.location_observation = np.array([0.0, 0.0])
         self.observation = np.append(self.laser_observation, self.location_observation)
@@ -120,6 +148,22 @@ class simplified_env(gym.Env, Node):
             "distance": self.location_observation[0],
             "bearing": self.location_observation[1]
         }
+
+    def compute_rewards(self, info):
+        reward = 0
+
+        if info["distance"] < self._tolerence:
+            reward += 2
+        elif info["distance"] < 2 * self._tolerence:
+            reward += 1
+
+        if self.ros_gz_interface.obstacle_hit_penalty:
+            reward += -1
+        if self.ros_gz_interface.out_of_bound_penalty:
+            reward += -3
+
+        return reward
+
 
 def main(args=None):
     rclpy.init(args=args)

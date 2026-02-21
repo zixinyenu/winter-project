@@ -25,8 +25,9 @@ class ros_gz_interface:
         self.bearing = 0
 
     ########## ROS_Functions_Start ##########
-    def publish_twist(self, linear_x, angular_z):
-        self.turtle_environment.cmd_vel_publish([linear_x, angular_z])
+    # action = [linear_x, angular_z]
+    def publish_twist(self, action):
+        self.turtle_environment.cmd_vel_publish(action)
 
     def get_distance_and_bearing(self):
         return self.distance, self.bearing
