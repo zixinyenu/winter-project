@@ -40,6 +40,10 @@ class ros_gz_interface:
 
     def obstacle_hit_penalty(self):
         return self.turtle_environment._obstacle_hit_penalty
+
+    def interface_destroy(self):
+        self.turtle_environment.turtle_env_destroy()
+        self.gazebo_environment.gazebo_env_destroy()
     ########## ROS_Functions_End ##########
 
     def set_episode_num(self, episode_num):

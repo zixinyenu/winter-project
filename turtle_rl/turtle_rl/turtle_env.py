@@ -125,6 +125,14 @@ class turtle_env:
         msg.angular.z = vel_list[1]
         self.cmd_vel_pub.publish(msg)
 
+    def turtle_env_destroy(self):
+        self.node.destroy_subscription(self.laser_sub)
+        self.node.destroy_subscription(self.turtle_pos_sub)
+        self.node.destroy_subscription(self.fence_contact_sub)
+        self.node.destroy_subscription(self.obstacle_contact_sub)
+        self.node.destroy_publisher(self.cmd_vel_pub)
+        self.node.destroy_timer(self.contact_timer)
+
 
 # def main(args=None):
 #     rclpy.init(args=args)

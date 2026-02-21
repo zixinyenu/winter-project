@@ -132,7 +132,11 @@ class simplified_env(gym.Env, Node):
         pass
 
     def close(self):
-        pass
+        self.destroy_client(self.control_simulation_cli)
+        self.destroy_client(self.set_up_new_episode_cli)
+        self.destroy_client(self.delete_all_obstacles_cli)
+        self.ros_gz_interface.interface_destroy()
+        self.destroy_node()
 
     def spin(self):
         rclpy.spin_once(self)

@@ -183,6 +183,15 @@ class gazebo_env:
 
         return response
 
+    def gazebo_env_destroy(self):
+        self.node.destroy_client(self.control_world_cli)
+        self.node.destroy_client(self.set_entity_pose_cli)
+        self.node.destroy_client(self.spawn_entity_cli)
+        self.node.destroy_client(self.delete_entity_cli)
+        self.node.destroy_service(self.control_simulation_ser)
+        self.node.destroy_service(self.set_up_new_episode_ser)
+        self.node.destroy_service(self.delete_all_obstacles_ser)
+
 
 # def main(args=None):
 #     rclpy.init(args=args)
