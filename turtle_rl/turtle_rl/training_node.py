@@ -46,7 +46,6 @@ def main(args=None):
     env = gym.make("Simplified-V0")
     env = Monitor(env)
     env.reset()
-    node.get_logger().info("\n Initial reset. \n")
 
     # Check custom environment to see if it is fine
     # env_checker.check_env(env)
@@ -67,14 +66,7 @@ def main(args=None):
         policy="MlpPolicy",
         env=env,
         verbose=1,
-        tensorboard_log=logs_dir,
-        n_steps=20480,
-        gamma=0.99,
-        gae_lambda=0.95,
-        ent_coef=0.0,
-        vf_coef=0.5,
-        learning_rate=0.00001,
-        clip_range=0.2
+        tensorboard_log=logs_dir
     )
     try:
         # model.learn(
@@ -83,18 +75,24 @@ def main(args=None):
         #     callback=eval_callback,
         #     tb_log_name=f"{algorithm}"
         # )
-        TIMESTEPS = 1000
-        for i in range(1, 30):
+        TIMESTEPS = 10
+        for i in range(1, 10):
             model.learn(
                 total_timesteps=TIMESTEPS,
                 reset_num_timesteps=False,
                 tb_log_name=algorithm
             )
-        model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
+            node.get_logger().info(f"Model_{TIMESTEPS*i} has been trained")
+            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
+            node.get_logger().info(f"Model_{TIMESTEPS*i} has been saved")
     except KeyboardInterrupt:
         model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
-    # Save the trained model
-    # model.save(f"{models_dir}/{algorithm}")
+
+    env.close()
+
+    node.get_logger().info("This episode of training has finished.")
+    node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == "__main__":
     main()

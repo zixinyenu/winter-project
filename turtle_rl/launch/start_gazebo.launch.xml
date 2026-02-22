@@ -71,4 +71,6 @@
         <!--########## Service_Bridge_End ##########-->
     </ros_gz_bridge>
 
+    <node pkg="turtle_rl" exec="gazebo_controller" name="gazebo_controller" />
+
 </launch>

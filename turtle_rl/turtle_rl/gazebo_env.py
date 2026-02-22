@@ -3,6 +3,7 @@ from rclpy.node import Node
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from std_srvs.srv import Empty
 from ros_gz_interfaces.srv import ControlWorld, SetEntityPose, SpawnEntity, DeleteEntity
+from turtle_interfaces.srv import SetUpNewEpisode
 
 from .map_env import *
 
@@ -12,7 +13,7 @@ class gazebo_env:
     def __init__(self, node: Node):
         # super().__init__('gazebo_env')
         self.node = node
-        self.node.get_logger().info("The gazebo_env fraction has just been created.")
+        # self.node.get_logger().info("The gazebo_env fraction has just been created.")
 
         # Clients
         self._callback_group = MutuallyExclusiveCallbackGroup()
@@ -56,7 +57,7 @@ class gazebo_env:
             callback=self.control_simulation_callback
         )
         self.set_up_new_episode_ser = self.node.create_service(
-            Empty,
+            SetUpNewEpisode,
             '/set_up_new_episode',
             callback=self.set_up_new_episode_callback
         )
@@ -73,10 +74,6 @@ class gazebo_env:
         self._rectangle_count = 0
         self._cylinder_count = 0
         self._goal_pos = [0, 0]
-        self._episode_num = 0
-
-    def episode_num_setter(self, episode_num):
-        self._episode_num = episode_num
 
     async def control_simulation_callback(self, request, response):
         control_world_request = ControlWorld.Request()
@@ -93,7 +90,7 @@ class gazebo_env:
         return response
 
     async def set_up_new_episode_callback(self, request, response):
-        episode_num = self._episode_num
+        episode_num = int(request.episode_num)
         world_path = create_new_world(self._worlds_path, episode_num)
 
         ol, square_list, rectangle_list, cylinder_list, start_pos, goal_pos= create_map(randomness=3)

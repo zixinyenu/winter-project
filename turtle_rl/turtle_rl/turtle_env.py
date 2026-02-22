@@ -15,13 +15,14 @@ class turtle_env:
     def __init__(self, node: Node):
         # super().__init__('turtle_env')
         self.node = node
-        self.node.get_logger().info("The turtle_env fraction has just been created.")
+        # self.node.get_logger().info("The turtle_env fraction has just been created.")
 
         # Parameter
         try:
             self.node.declare_parameter('frequency', 100)
         except ParameterAlreadyDeclaredException:
-            self.node.get_logger().info("Parameter \"frequency\" has already been declared in previous step.")
+            # self.node.get_logger().info("Parameter \"frequency\" has already been declared in previous step.")
+            pass
         self.fre_ = self.node.get_parameter('frequency').value
 
         # Subscription
@@ -73,14 +74,12 @@ class turtle_env:
     def timer_callback(self):
         if self._prev_fence_contact_count != self._curr_fence_contact_count:
             self._out_of_bound_penalty = True
-            self.node.get_logger().info(f"Apply out-of-bound penalty: {self._out_of_bound_penalty}")
             self._prev_fence_contact_count = self._curr_fence_contact_count
         else:
             self._out_of_bound_penalty = False
 
         if self._prev_obstacle_contact_count != self._curr_obstacle_contact_count:
             self._obstacle_hit_penalty = True
-            self.node.get_logger().info(f"Apply obstacle-hit penalty: {self._obstacle_hit_penalty}")
             self._prev_obstacle_contact_count = self._curr_obstacle_contact_count
         else:
             self._obstacle_hit_penalty = False

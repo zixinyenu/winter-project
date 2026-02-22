@@ -23,7 +23,7 @@ class simplified_env(gym.Env, Node):
 
         # Action space: 
         self.action_space = spaces.Box(
-            low=np.array([0, -self._max_rotational_vel]),
+            low=np.array([np.float32(0), -self._max_rotational_vel]),
             high=np.array([self._max_translational_velocity, self._max_rotational_vel]),
             dtype=np.float32
         )
@@ -42,38 +42,10 @@ class simplified_env(gym.Env, Node):
             dtype=np.float32
         )
 
-        # Clients
-        self._se_callback_group = MutuallyExclusiveCallbackGroup()
-
-        self.control_simulation_cli = self.create_client(
-            Empty,
-            '/control_simulation',
-            callback_group=self._se_callback_group
-        )
-        while not self.control_simulation_cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for control simulation client to be available...")
-
-        self.set_up_new_episode_cli = self.create_client(
-            Empty,
-            '/set_up_new_episode',
-            callback_group=self._se_callback_group
-        )
-        while not self.set_up_new_episode_cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for set up new episode client to be available...")
-
-        self.delete_all_obstacles_cli = self.create_client(
-            Empty,
-            '/delete_all_obstacles',
-            callback_group=self._se_callback_group
-        )
-        while not self.delete_all_obstacles_cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for delete all obstacles client to be available...")
-
         # RL variables
         self.done = False
         self.truncated = False
 
-        self._episode_count = 0
         self._step_count = 0
 
         self.laser_observation = np.array([np.float32(9)]*360)
@@ -100,7 +72,10 @@ class simplified_env(gym.Env, Node):
         reward = self.compute_rewards(info)
 
         # Check if the turtlebot reaches the goal with a tolerence
-        self.done = (info["distance"] < self._tolerence)
+        flag_1 = (info["distance"] < self._tolerence)
+        flag_2 = self.ros_gz_interface.out_of_bound_penalty()
+        flag_3 = self.ros_gz_interface.obstacle_hit_penalty()
+        self.done = flag_1 or flag_2 or flag_3
         terminated = self.done
 
         # truncated is also False
@@ -111,33 +86,9 @@ class simplified_env(gym.Env, Node):
     def reset(self, seed=None, options=None):
         # Reset RL variables
         self.done = False
-        self.truncated = False
-
-        self._step_count = 0
-
         self.laser_observation = np.array([np.float32(9)]*360)
         self.location_observation = np.array([0.0, 0.0])
         self.observation = np.append(self.laser_observation, self.location_observation)
-
-        # Pause the simulation
-        # pause_request = Empty.Request()
-        # result = await self.control_simulation_cli(pause_request)
-
-        # Re-initialize ros_gz_interface
-        self.ros_gz_interface = ros_gz_interface(self)
-
-        # Delete all obstacles in the scene
-        # delete_request = Empty.Request()
-        # result = await self.delete_all_obstacles_cli(delete_request)
-
-        # Spawn all obstacles and move the turtlebot to its start pose
-        self.ros_gz_interface.set_episode_num(self._episode_count)
-        # set_request = Empty.Request()
-        # result = await self.set_up_new_episode_cli(set_request)
-
-        # Resume the simulation
-        # resume_request = Empty.Request()
-        # result = await self.control_simulation_cli(resume_request)
 
         # Spin once
         self.spin()
@@ -146,18 +97,12 @@ class simplified_env(gym.Env, Node):
         observation = self.get_observation()
         info = self.get_info()
 
-        # Increment critical value
-        self._episode_count += 1
-
         return observation, info
 
     def render(self):
         pass
 
     def close(self):
-        self.destroy_client(self.control_simulation_cli)
-        self.destroy_client(self.set_up_new_episode_cli)
-        self.destroy_client(self.delete_all_obstacles_cli)
         self.ros_gz_interface.interface_destroy()
         self.destroy_node()
 
@@ -184,10 +129,12 @@ class simplified_env(gym.Env, Node):
         elif info["distance"] < 2 * self._tolerence:
             reward += 1
 
-        if self.ros_gz_interface.obstacle_hit_penalty:
+        if self.ros_gz_interface.obstacle_hit_penalty():
             reward += -1
-        if self.ros_gz_interface.out_of_bound_penalty:
+            self.get_logger().info("Apply out-of-bound penalty.")
+        if self.ros_gz_interface.out_of_bound_penalty():
             reward += -3
+            self.get_logger().info("Apply obstacle-hit penalty.")
 
         return reward
 
