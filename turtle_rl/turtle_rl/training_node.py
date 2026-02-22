@@ -6,6 +6,7 @@ from stable_baselines3 import PPO
 from stable_baselines3.common import env_checker
 from stable_baselines3.common import callbacks
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.vec_env import DummyVecEnv, VecCheckNan
 
 from .simplified_env import simplified_env
 
@@ -46,13 +47,17 @@ def main(args=None):
 
     # Make custom environment
     # env = gym.make("Simplified-V0")
-    env = simplified_env()
-    env = Monitor(env)
+
+    # env = simplified_env()
+    # env = Monitor(env)
+
+    env = DummyVecEnv([lambda: simplified_env()])
+    env = VecCheckNan(env, raise_exception=True)
     env.reset()
 
     # Check custom environment to see if it is fine
-    env_checker.check_env(env)
-    node.get_logger().info("The simplified_env has been checked.")
+    # env_checker.check_env(env)
+    # node.get_logger().info("The simplified_env has been checked.")
 
     # Create callbacks needed for training
     # stop_callback = callbacks.StopTrainingOnRewardThreshold(reward_threshold=1500, verbose=1)
