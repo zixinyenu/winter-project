@@ -102,6 +102,7 @@ class turtle_env:
         laser_reading = np.array(msg.ranges)
         # Convert infinity to 9m, since LSD-02 can only detect up to 8m
         laser_reading[laser_reading == np.inf] = np.float32(9)
+        laser_reading[laser_reading == -np.inf] = np.float32(0.06)
         self._laser_readings = laser_reading
 
     def turtle_pos_callback(self, msg: TFMessage):
