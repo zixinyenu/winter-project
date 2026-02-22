@@ -74,13 +74,15 @@ class turtle_env:
     def timer_callback(self):
         if self._prev_fence_contact_count != self._curr_fence_contact_count:
             self._out_of_bound_penalty = True
-            self._prev_fence_contact_count = self._curr_fence_contact_count
+            self._prev_fence_contact_count = 0
+            self._curr_fence_contact_count = 0
         else:
             self._out_of_bound_penalty = False
 
         if self._prev_obstacle_contact_count != self._curr_obstacle_contact_count:
             self._obstacle_hit_penalty = True
-            self._prev_obstacle_contact_count = self._curr_obstacle_contact_count
+            self._prev_obstacle_contact_count = 0
+            self._curr_obstacle_contact_count = 0
         else:
             self._obstacle_hit_penalty = False
 

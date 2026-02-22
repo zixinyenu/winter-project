@@ -22,10 +22,14 @@ class simplified_env(gym.Env, Node):
         self._max_detection_distance = np.float32(8.0) # Not used
 
         # Action space: 
-        self.action_space = spaces.Box(
-            low=np.array([np.float32(0), -self._max_rotational_vel]),
-            high=np.array([self._max_translational_velocity, self._max_rotational_vel]),
-            dtype=np.float32
+        # self.action_space = spaces.Box(
+        #     low=np.array([np.float32(0), -self._max_rotational_vel]),
+        #     high=np.array([self._max_translational_velocity, self._max_rotational_vel]),
+        #     dtype=np.float32
+        # )
+        self.action_space = spaces.MultiDiscrete(
+            nvec=np.array([12, 17]),
+            dtype=np.uint8
         )
         # Observation space: 
         obs_low = np.append(
@@ -57,9 +61,11 @@ class simplified_env(gym.Env, Node):
         self._step_count += 1
 
         # Publish an aciton, action = [linear_x, angular_z]
-        linear_x = action[0]
-        linear_y = action[1]
-        self.ros_gz_interface.publish_twist([float(linear_x), float(linear_y)])
+        # linear_x = action[0]
+        # angular_z = action[1]
+        linear_x = action[0] * 0.02
+        angular_z = -2.84 + action[1] * 0.355
+        self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
 
         # Spin once
         self.spin()
@@ -72,10 +78,13 @@ class simplified_env(gym.Env, Node):
         reward = self.compute_rewards(info)
 
         # Check if the turtlebot reaches the goal with a tolerence
-        flag_1 = (info["distance"] < self._tolerence)
-        flag_2 = self.ros_gz_interface.out_of_bound_penalty()
-        flag_3 = self.ros_gz_interface.obstacle_hit_penalty()
-        self.done = flag_1 or flag_2 or flag_3
+        if (info["distance"] < self._tolerence):
+            flag_1 = True
+        else:
+            flag_1 = False
+        # flag_2 = self.ros_gz_interface.out_of_bound_penalty()
+        # flag_3 = self.ros_gz_interface.obstacle_hit_penalty()
+        self.done = flag_1
         terminated = self.done
 
         # truncated is also False
@@ -89,6 +98,8 @@ class simplified_env(gym.Env, Node):
         self.laser_observation = np.array([np.float32(9)]*360)
         self.location_observation = np.array([0.0, 0.0])
         self.observation = np.append(self.laser_observation, self.location_observation)
+
+        # self.ros_gz_interface = ros_gz_interface(self)
 
         # Spin once
         self.spin()
@@ -131,10 +142,10 @@ class simplified_env(gym.Env, Node):
 
         if self.ros_gz_interface.obstacle_hit_penalty():
             reward += -1
-            self.get_logger().info("Apply out-of-bound penalty.")
+            self.get_logger().info("Apply obstacle-hit penalty.")
         if self.ros_gz_interface.out_of_bound_penalty():
             reward += -3
-            self.get_logger().info("Apply obstacle-hit penalty.")
+            self.get_logger().info("Apply out-of-bound penalty.")
 
         return reward
 

@@ -7,6 +7,8 @@ from stable_baselines3.common import env_checker
 from stable_baselines3.common import callbacks
 from stable_baselines3.common.monitor import Monitor
 
+from .simplified_env import simplified_env
+
 import os
 
 class training_node(Node):
@@ -35,21 +37,22 @@ def main(args=None):
         os.makedirs(logs_dir)
 
     # Register custom environment
-    registration.register(
-        id="Simplified-V0",
-        entry_point="turtle_rl.simplified_env:simplified_env",
-        max_episode_steps=150
-    )
-    node.get_logger().info("The simplified_env has been resgistered successfully.")
+    # registration.register(
+    #     id="Simplified-V0",
+    #     entry_point="turtle_rl.simplified_env:simplified_env",
+    #     max_episode_steps=150
+    # )
+    # node.get_logger().info("The simplified_env has been resgistered successfully.")
 
     # Make custom environment
-    env = gym.make("Simplified-V0")
+    # env = gym.make("Simplified-V0")
+    env = simplified_env()
     env = Monitor(env)
     env.reset()
 
     # Check custom environment to see if it is fine
-    # env_checker.check_env(env)
-    # node.get_logger().info("The simplified_env has been checked.")
+    env_checker.check_env(env)
+    node.get_logger().info("The simplified_env has been checked.")
 
     # Create callbacks needed for training
     # stop_callback = callbacks.StopTrainingOnRewardThreshold(reward_threshold=1500, verbose=1)
@@ -66,7 +69,8 @@ def main(args=None):
         policy="MlpPolicy",
         env=env,
         verbose=1,
-        tensorboard_log=logs_dir
+        tensorboard_log=logs_dir,
+        learning_rate=0.1
     )
     try:
         # model.learn(
@@ -75,7 +79,7 @@ def main(args=None):
         #     callback=eval_callback,
         #     tb_log_name=f"{algorithm}"
         # )
-        TIMESTEPS = 10
+        TIMESTEPS = 10000
         for i in range(1, 10):
             model.learn(
                 total_timesteps=TIMESTEPS,
