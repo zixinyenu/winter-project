@@ -32,7 +32,7 @@ class ros_gz_interface:
         self.turtle_environment.cmd_vel_publish(action)
 
     def get_distance_and_bearing(self):
-        return self._distance, self._bearing
+        return [self._distance, self._bearing]
 
     def get_laser_readings(self):
         return self.turtle_environment._laser_readings
@@ -80,7 +80,7 @@ class ros_gz_interface:
             turtle_y - goal_y,
             turtle_x - goal_x
         )
-        return [np.float32(distance), np.float32(bearing)]
+        return np.float32(distance), np.float32(bearing)
 
     def _out_of_bound_grid_check(self, map_length=12, map_width=12, collision_raidus=0.11):
         turtle_x = self.turtle_environment._turtle_pos[0]

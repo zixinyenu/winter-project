@@ -49,11 +49,12 @@ class simplified_env(gym.Env, Node):
         # RL variables
         self.done = False
         self.truncated = False
+        self.reward = 0
 
         self._step_count = 0
 
         self.laser_observation = np.array([np.float32(9)]*360)
-        self.location_observation = np.array([0.0, 0.0])
+        self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
     def step(self, action):
@@ -75,14 +76,18 @@ class simplified_env(gym.Env, Node):
         info = self.get_info()
 
         # Get the reward
-        reward = self.compute_rewards(info)
+        self.compute_rewards()
+        reward = self.reward
 
         # Check if the turtlebot reaches the goal with a tolerence
-        if (info["distance"] < self._tolerence):
+        # After initialization, self.location_observation[0] == 0 will be True briefly
+        if (self.location_observation[0] < self._tolerence) and self.location_observation[0] != 0:
             flag_1 = True
         else:
             flag_1 = False
-        self.done = flag_1
+        flag_2 = self.ros_gz_interface.out_of_bound_penalty_grid()
+        flag_3 = self.ros_gz_interface.obstacle_hit_penalty_grid()
+        self.done = flag_1 or flag_2 or flag_3
         terminated = self.done
 
         # truncated is also False
@@ -91,10 +96,12 @@ class simplified_env(gym.Env, Node):
         return observation, reward, terminated, truncated, info
 
     def reset(self, seed=None, options=None):
+        self.get_logger().info("Reset...")
+
         # Reset RL variables
         self.done = False
         self.laser_observation = np.array([np.float32(9)]*360)
-        self.location_observation = np.array([0.0, 0.0])
+        self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
         # self.ros_gz_interface = ros_gz_interface(self)
@@ -130,31 +137,32 @@ class simplified_env(gym.Env, Node):
             "bearing": self.location_observation[1]
         }
 
-    def compute_rewards(self, info):
-        reward = 0
+    def compute_rewards(self):
+        self.reward = 0
 
-        if info["distance"] < self._tolerence:
-            reward += 2
+        # After initialization, self.location_observation[0] == 0 will be True briefly
+        if self.location_observation[0] < self._tolerence and self.location_observation[0] != 0:
+            self.reward += 10
             self.get_logger().info(f"The turtlebot is within {self._tolerence} from the goal!")
-        elif info["distance"] < 2 * self._tolerence:
-            reward += 1
+        elif self.location_observation[0] < 2 * self._tolerence and self.location_observation[0] != 0:
+            self.reward += 5
             self.get_logger().info(f"The turtlebot is within {2 * self._tolerence} from the goal!")
 
         if self.ros_gz_interface.out_of_bound_penalty_init():
-            reward += -3
+            self.reward += -3
             self.get_logger().info("Apply out-of-bound penalty (initial).")
         if self.ros_gz_interface.obstacle_hit_penalty_init():
-            reward += -2
+            self.reward += -2
             self.get_logger().info("Apply obstacle-hit penalty. (initial)")
 
         if self.ros_gz_interface.out_of_bound_penalty_grid():
-            reward += -0.01
+            self.reward += -0.01
             self.get_logger().info("Apply out-of-bound penalty (constant).")
         if self.ros_gz_interface.obstacle_hit_penalty_grid():
-            reward += -0.01
+            self.reward += -0.01
             self.get_logger().info("Apply obstacle-hit penalty. (constant)")
 
-        return reward
+        return self.reward
 
 
 def main(args=None):
