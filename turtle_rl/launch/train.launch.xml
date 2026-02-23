@@ -1,10 +1,6 @@
 <launch>
 
     <arg name="world_name" default="empty" description="Name of the world." />
-
-    <!--
-    <node pkg="turtle_rl" exec="simplified_environment" name="simplified_environment" />
-    -->
     
     <node pkg="turtle_rl" exec="training_node" name="training_node" />
 

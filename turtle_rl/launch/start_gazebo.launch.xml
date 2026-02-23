@@ -16,8 +16,8 @@
     <node pkg="ros_gz_sim" exec="create" name="create_turtle" output="screen">
         <param name="topic" value="/robot_description"/>
         <!--Set to unfeasible values. Will be overridden upon the setting-up of first episode.-->
-        <param name="x" value="-8.0"/>
-        <param name="y" value="-8.0"/>
+        <param name="x" value="0.0"/>
+        <param name="y" value="0.0"/>
         <param name="z" value="0.0"/>
         <param name="R" value="0.0"/>
         <param name="P" value="0.0"/>
@@ -71,6 +71,16 @@
         <!--########## Service_Bridge_End ##########-->
     </ros_gz_bridge>
 
+    <executable
+        cmd="/set_up_new_episode turtle_interfaces/srv/SetUpNewEpisode \'episode_num: 0\'"
+        cwd="/home"
+        launch-prefix="ros2 service call"
+        output="screen"
+        >
+    </executable>
+
+    <!--
     <node pkg="turtle_rl" exec="gazebo_controller" name="gazebo_controller" />
+    -->
 
 </launch>
