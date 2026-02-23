@@ -185,11 +185,10 @@ def check_collision(obstacle_list, pending_list):
     return False
 
 ########## TURTLE_FUNCTIONS_START ##########
-def gen_turtle_apt(map_length, map_width, d, collision_radius, noise):
+def gen_turtle_apt(map_length, map_width, d, collision_radius):
     x = np.random.uniform(low=-map_length/2, high=map_length/2)
     y = np.random.uniform(low=-map_width/2, high=map_width/2)
-    radius = np.random.normal(loc=collision_radius, scale=noise)
-    radius = abs(radius)
+    radius = collision_radius
 
     pending_list = []
     success = True
@@ -397,7 +396,7 @@ def create_map(
 
     turtle_count = 0
     while turtle_count < 2:
-        x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length, map_width, divison, collision_radius, 0.0)
+        x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length, map_width, divison, collision_radius)
         if not success:
             continue
         flag = check_turtle_collision(obstacle_list, pending_list)
