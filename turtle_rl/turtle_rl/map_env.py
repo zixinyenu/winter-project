@@ -11,12 +11,12 @@ dx -- dx = $(length_of_the_map) / 2 * (-1)
 dy -- dy = $(width_of_the_map) / 2 * (-1)
 d -- division of one meter, which represents the resolution of the map
 """
-def ij2xy(i, j, dx=-6.0, dy=-6.0, d=100):
+def ij2xy(i, j, dx=-3.0, dy=-3.0, d=100):
     x = j/d + dx
     y = i/d + dy
     return x, y
 
-def xy2ij(x, y, dx=-6.0, dy=-6.0, d=100):
+def xy2ij(x, y, dx=-3.0, dy=-3.0, d=100):
     i = int((y - dy)*d)
     j = int((x - dx)*d)
     return i, j
@@ -68,7 +68,7 @@ def gen_square_atp(map_length, map_width, d, mean_side, noise, rotate=False):
         if ystart < -map_width/2 or xstart < -map_length/2 or \
             ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
             success = False
-            return 7, 7, 6.28, -1, [], success
+            return 4, 4, 6.28, -1, [], success
 
         for yp in np.arange(start=ystart, stop=ystop, step=1/d):
             for xp in np.arange(start=xstart, stop=xstop, step=1/d):
@@ -85,7 +85,7 @@ def gen_square_atp(map_length, map_width, d, mean_side, noise, rotate=False):
             abs(sw[0]) > map_length/2 or abs(sw[1]) > map_width/2 or \
             abs(se[0]) > map_length/2 or abs(se[1]) > map_width/2:
             success = False
-            return 7, 7, 6.28, -1, [], success
+            return 4, 4, 6.28, -1, [], success
 
         for yp in np.arange(start=ystart, stop=ystop, step=1/d):
             for xp in np.arange(start=xstart, stop=xstop, step=1/d):
@@ -120,7 +120,7 @@ def gen_rectangle_atp(map_length, map_width, d, mean_len, mean_wdt, noise, rotat
         if ystart < -map_width/2 or xstart < -map_length/2 or \
             ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
             success = False
-            return 7, 7, 6.28, -1, -1, [], success
+            return 4, 4, 6.28, -1, -1, [], success
 
         for yp in np.arange(start=ystart, stop=ystop, step=1/d):
             for xp in np.arange(start=xstart, stop=xstop, step=1/d):
@@ -137,7 +137,7 @@ def gen_rectangle_atp(map_length, map_width, d, mean_len, mean_wdt, noise, rotat
             abs(sw[0]) > map_length/2 or abs(sw[1]) > map_width/2 or \
             abs(se[0]) > map_length/2 or abs(se[1]) > map_width/2:
             success = False
-            return 7, 7, 6.28, -1, -1, [], success
+            return 4, 4, 6.28, -1, -1, [], success
 
         for yp in np.arange(start=ystart, stop=ystop, step=1/d):
             for xp in np.arange(start=xstart, stop=xstop, step=1/d):
@@ -164,7 +164,7 @@ def gen_cylinder_apt(map_length, map_width, d, mean_radius, noise):
     if ystart < -map_width/2 or xstart < -map_length/2 or \
         ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
         success = False
-        return 7, 7, -1, [], success
+        return 4, 4, -1, [], success
     for yp in np.arange(start=ystart, stop=ystop, step=1/d):
         for xp in np.arange(start=xstart, stop=xstop, step=1/d):
             if (yp - y)**2 + (xp-x)**2 > radius**2:
@@ -201,7 +201,7 @@ def gen_turtle_apt(map_length, map_width, d, collision_radius):
     if ystart < -map_width/2 or xstart < -map_length/2 or \
         ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
         success = False
-        return 7, 7, 6.28, -1, [], success
+        return 4, 4, 6.28, -1, [], success
     for yp in np.arange(start=ystart, stop=ystop, step=1/d):
         for xp in np.arange(start=xstart, stop=xstop, step=1/d):
             if (yp - y)**2 + (xp-x)**2 > radius**2:
@@ -222,8 +222,8 @@ def check_turtle_collision(obstacle_list, pending_list):
 ########## TURTLE_FUNCTIONS_END ##########
         
 def create_map(
-        map_length = 12,
-        map_width = 12,
+        map_length = 6,
+        map_width = 6,
         divison = 100,
         collision_radius=0.11,
         randomness = 1,
@@ -235,7 +235,7 @@ def create_map(
     rectangle_list = []
     cylinder_list = []
     turtle_param = []
-    turtle_goal = [-7.0, -7.0]
+    turtle_goal = [-4.0, -4.0]
     
     # Generate fixed number of obstacles: 2 squares + 4 rectangles + 2 cylinders
     # Obstacles have random positions and a fixed default orientation: 0.0
@@ -315,10 +315,10 @@ def create_map(
     # Obstacles of same type tend to have relatively more different size
     # More realistic for the problem framing of the turtle_rl package
     elif randomness == 3:
-        total = 20
+        total = 18
 
-        square_total = int(np.random.normal(loc=6, scale=2))
-        rectangle_total = int(np.random.normal(loc=8, scale=2))
+        square_total = int(np.random.normal(loc=4, scale=1))
+        rectangle_total = int(np.random.normal(loc=10, scale=2))
         cylinder_total = total - square_total - rectangle_total
 
         small_square_total = np.random.randint(low=1, high=square_total+1)
@@ -330,7 +330,7 @@ def create_map(
 
         small_square_count = 0
         while small_square_count < small_square_total:
-            x, y, rad, side, pending_list, success = gen_square_atp(map_length, map_width, divison, 0.4, 0.1, True)
+            x, y, rad, side, pending_list, success = gen_square_atp(map_length, map_width, divison, 0.3, 0.1, True)
             if not success:
                 continue
             flag = check_collision(obstacle_list, pending_list)
@@ -341,7 +341,7 @@ def create_map(
 
         big_square_count = 0
         while big_square_count < big_square_total:
-            x, y, rad, side, pending_list, success = gen_square_atp(map_length, map_width, divison, 0.8, 0.15, True)
+            x, y, rad, side, pending_list, success = gen_square_atp(map_length, map_width, divison, 0.6, 0.15, True)
             if not success:
                 continue
             flag = check_collision(obstacle_list, pending_list)
@@ -352,7 +352,7 @@ def create_map(
 
         slim_rectangle_count = 0
         while slim_rectangle_count < slim_rectangle_total:
-            x, y, rad, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 1.2, 0.15, 0.05, True)
+            x, y, rad, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 0.8, 0.15, 0.05, True)
             if not success:
                 continue
             flag = check_collision(obstacle_list, pending_list)
@@ -363,7 +363,7 @@ def create_map(
 
         thick_rectangle_count = 0
         while thick_rectangle_count < thick_rectangle_total:
-            x, y, rad, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 0.6, 0.4, 0.05, True)
+            x, y, rad, length, width, pending_list, success = gen_rectangle_atp(map_length, map_width, divison, 0.5, 0.3, 0.05, True)
             if not success:
                 continue
             flag = check_collision(obstacle_list, pending_list)
@@ -374,7 +374,7 @@ def create_map(
 
         small_cylinder_count = 0
         while small_cylinder_count < small_cylinder_total:
-            x, y, radius, pending_list, success = gen_cylinder_apt(map_length, map_width, divison, 0.3, 0.05)
+            x, y, radius, pending_list, success = gen_cylinder_apt(map_length, map_width, divison, 0.2, 0.05)
             if not success:
                 continue
             flag = check_collision(obstacle_list, pending_list)
@@ -385,7 +385,7 @@ def create_map(
 
         big_cylinder_count = 0
         while big_cylinder_count < big_cylinder_total:
-            x, y, radius, pending_list, success = gen_cylinder_apt(map_length, map_width, divison, 0.6, 0.1)
+            x, y, radius, pending_list, success = gen_cylinder_apt(map_length, map_width, divison, 0.4, 0.1)
             if not success:
                 continue
             flag = check_collision(obstacle_list, pending_list)
@@ -666,8 +666,8 @@ def create_cylinders(cylinder_param, cylinder_id, world_dir):
 # ol, sl, rl, cl, tp, tg= create_map(randomness=3)
 # xl = []
 # yl = []
-# for i in range(1201):
-#     for j in range(1201):
+# for i in range(601):
+#     for j in range(601):
 #         if ol[i][j] == 1:
 #             x, y = ij2xy(i, j)
 #             xl.append(x)
@@ -678,7 +678,7 @@ def create_cylinders(cylinder_param, cylinder_id, world_dir):
 # ax.add_patch(turtle_circle)
 # plt.arrow(tp[0], tp[1], np.sin(tp[2]), np.cos(tp[2]), width=0.05, label="turtle start orientation")
 # plt.plot(tg[0], tg[1], 'g^', label="turtle goal")
-# plt.xlim([-6, 6])
-# plt.ylim([-6, 6])
+# plt.xlim([-3, 3])
+# plt.ylim([-3, 3])
 # plt.legend(loc="upper right")
 # plt.show()

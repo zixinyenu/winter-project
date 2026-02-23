@@ -15,7 +15,7 @@ class simplified_env(gym.Env, Node):
         self.get_logger().info("The simplified_env node has just been created.")
         self.ros_gz_interface = ros_gz_interface(self)
         # TODO Make it a ROS parameter
-        self._tolerence = 0.10
+        self._tolerence = 0.15
         self._max_translational_velocity = np.float32(0.22)
         self._max_rotational_vel = np.float32(2.84)
         self._min_detection_distance = np.float32(0.16)
@@ -28,16 +28,16 @@ class simplified_env(gym.Env, Node):
         #     dtype=np.float32
         # )
         self.action_space = spaces.MultiDiscrete(
-            nvec=np.array([9, 9]),
+            nvec=np.array([3, 17]),
             dtype=np.uint8
         )
         # Observation space: 
         obs_low = np.append(
-            np.array([self._min_detection_distance - np.float32(0.1)]*360),
+            np.array([self._min_detection_distance - np.float32(0.1)]*36),
             np.array([np.float32(0), np.float32(-np.pi)])
         )
         obs_high = np.append(
-            np.array([np.float32(9)]*360),
+            np.array([np.float32(9)]*36),
             np.array([np.float32(8.4853), np.float32(np.pi)])
         ) # (6**2 + 6**2)**0.5 = 8.4853
         self.observation_space = spaces.Box(
@@ -52,8 +52,11 @@ class simplified_env(gym.Env, Node):
         self.reward = 0
 
         self._step_count = 0
+        self._episode_count = 0
+        self._helper_count_1 = -1
+        self._helper_count_2 = -1
 
-        self.laser_observation = np.array([np.float32(9)]*360)
+        self.laser_observation = np.array([np.float32(9)]*36)
         self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
@@ -64,8 +67,13 @@ class simplified_env(gym.Env, Node):
         # Publish an aciton, action = [linear_x, angular_z]
         # linear_x = action[0]
         # angular_z = action[1]
-        linear_x = -0.10 + action[0] * 0.04
-        angular_z = -2.84 + action[1] * 0.71
+        if action[0] == 0:
+            linear_x = 0.22
+        elif action[0] == 1:
+            linear_x = 0.16
+        else:
+            linear_x = -0.12
+        angular_z = -2.84 + action[1] * 0.355
         self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
 
         # Spin once
@@ -90,7 +98,7 @@ class simplified_env(gym.Env, Node):
 
         # Check if the episode needs to be truncated (turtlebot hits a fence or an obstacle)
         flag_2 = False
-        if self._step_count > 100000:
+        if self._step_count % 100000 == 0:
             flag_2 = True
         self.truncated = flag_2
         truncated = self.truncated
@@ -107,7 +115,7 @@ class simplified_env(gym.Env, Node):
         self.done = False
         self.truncated = False
 
-        self.laser_observation = np.array([np.float32(9)]*360)
+        self.laser_observation = np.array([np.float32(9)]*36)
         self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
@@ -116,6 +124,7 @@ class simplified_env(gym.Env, Node):
         if self._step_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
             new_goal_pos = self.ros_gz_interface.reset_goal_position()
             self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
+            self._episode_count += 1
 
         # Spin once to get initial observation and info
         self.spin()
@@ -152,12 +161,22 @@ class simplified_env(gym.Env, Node):
         self.reward = 0
 
         # After initialization, self.location_observation[0] will be very close to 0 briefly
-        if self.location_observation[0] < self._tolerence and self.location_observation[0] > 0.01:
-            self.reward += 10
+        if self.location_observation[0] < self._tolerence \
+            and self.location_observation[0] > 0.01:
+            self.reward += 50
             self.get_logger().info(f"The turtlebot is within {self._tolerence} from the goal!")
-        elif self.location_observation[0] < 2*self._tolerence and self.location_observation[0] > 0.01:
-            self.reward += 5
+        elif self.location_observation[0] < 2*self._tolerence \
+            and self.location_observation[0] > 0.01 \
+            and self._episode_count != self._helper_count_1:
+            self.reward += 25
             self.get_logger().info(f"The turtlebot is within {2 * self._tolerence} from the goal!")
+            self._helper_count_1 = self._episode_count
+        elif self.location_observation[0] < 8*self._tolerence \
+            and self.location_observation[0] > 0.01 \
+            and self._episode_count != self._helper_count_2:
+            self.reward += 10
+            self.get_logger().info(f"The turtlebot is within {8 * self._tolerence} from the goal!")
+            self._helper_count_2 = self._episode_count
 
         if self.ros_gz_interface.out_of_bound_penalty_init():
             self.reward += -3

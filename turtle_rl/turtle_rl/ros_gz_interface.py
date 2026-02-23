@@ -93,7 +93,7 @@ class ros_gz_interface:
         )
         return np.float32(distance), np.float32(bearing)
 
-    def _out_of_bound_grid_check(self, map_length=12, map_width=12, collision_raidus=0.11):
+    def _out_of_bound_grid_check(self, map_length=6, map_width=6, collision_raidus=0.11):
         turtle_x = self.turtle_environment._turtle_pos[0]
         turtle_y = self.turtle_environment._turtle_pos[1]
         if abs(turtle_x)+collision_raidus >= map_length/2 or abs(turtle_y)+collision_raidus >= map_width/2:
@@ -101,7 +101,7 @@ class ros_gz_interface:
         else:
             return False
 
-    def _create_turtle_pending_list(self, map_length=12, map_width=12, division=100, collision_radius=0.11):
+    def _create_turtle_pending_list(self, map_length=6, map_width=6, division=100, collision_radius=0.11):
         turtle_x = self.turtle_environment._turtle_pos[0]
         turtle_y = self.turtle_environment._turtle_pos[1]
 
