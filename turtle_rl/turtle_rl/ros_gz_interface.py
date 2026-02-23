@@ -52,6 +52,10 @@ class ros_gz_interface:
     def interface_destroy(self):
         self.turtle_environment.turtle_env_destroy()
         self.gazebo_environment.gazebo_env_destroy()
+
+    def reset_goal_position(self):
+        new_goal_pos = self.gazebo_environment.reset_goal_position()
+        return new_goal_pos
     ########## ROS_Functions_End ##########
 
     def timer_callback(self):

@@ -28,7 +28,7 @@ class simplified_env(gym.Env, Node):
         #     dtype=np.float32
         # )
         self.action_space = spaces.MultiDiscrete(
-            nvec=np.array([13, 17]),
+            nvec=np.array([17, 17]),
             dtype=np.uint8
         )
         # Observation space: 
@@ -64,7 +64,7 @@ class simplified_env(gym.Env, Node):
         # Publish an aciton, action = [linear_x, angular_z]
         # linear_x = action[0]
         # angular_z = action[1]
-        linear_x = -0.02 + action[0] * 0.02
+        linear_x = -0.10 + action[0] * 0.02
         angular_z = -2.84 + action[1] * 0.355
         self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
 
@@ -85,10 +85,14 @@ class simplified_env(gym.Env, Node):
             flag_1 = True
         else:
             flag_1 = False
+        self.done = flag_1
+        terminated = self.done
+
+        # Check if the episode needs to be truncated (turtlebot hits a fence or an obstacle)
         flag_2 = self.ros_gz_interface.out_of_bound_penalty_grid()
         flag_3 = self.ros_gz_interface.obstacle_hit_penalty_grid()
-        self.done = flag_1 or flag_2 or flag_3
-        terminated = self.done
+        self.truncated = flag_2 or flag_3
+        truncated = self.truncated
 
         # truncated is also False
         truncated = self.truncated
@@ -100,11 +104,16 @@ class simplified_env(gym.Env, Node):
 
         # Reset RL variables
         self.done = False
+        self.truncated = False
+
         self.laser_observation = np.array([np.float32(9)]*360)
         self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
-        # self.ros_gz_interface = ros_gz_interface(self)
+        # Reset the goal position
+        if self._step_count != 0:
+            new_goal_pos = self.ros_gz_interface.reset_goal_position()
+            self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
 
         # Spin once to get initial observation and info
         self.spin()
@@ -157,10 +166,10 @@ class simplified_env(gym.Env, Node):
 
         if self.ros_gz_interface.out_of_bound_penalty_grid():
             self.reward += -0.01
-            self.get_logger().info("Apply out-of-bound penalty (constant).")
+            # self.get_logger().info("Apply out-of-bound penalty (constant).")
         if self.ros_gz_interface.obstacle_hit_penalty_grid():
             self.reward += -0.01
-            self.get_logger().info("Apply obstacle-hit penalty. (constant)")
+            # self.get_logger().info("Apply obstacle-hit penalty. (constant)")
 
         return self.reward
 

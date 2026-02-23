@@ -98,7 +98,7 @@ class gazebo_env:
         obstacle_list, square_list, rectangle_list, cylinder_list, start_pos, goal_pos= create_map(randomness=3)
         self._obstacle_list = obstacle_list
         self._goal_pos = goal_pos
-        self.node.get_logger().info(f"Goal position set at ({goal_pos[0]}, {goal_pos[1]})")
+        self.node.get_logger().info(f"Initial goal position set at ({goal_pos[0]}, {goal_pos[1]})")
 
         set_pose_request = SetEntityPose.Request()
         set_pose_request.entity.name = "turtlebot3_burger"
@@ -107,7 +107,7 @@ class gazebo_env:
         set_pose_request.pose.position.z = 0.0
         set_pose_request.pose.orientation.z = start_pos[2]
         result = await self.set_entity_pose_cli.call_async(set_pose_request)
-        self.node.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
+        self.node.get_logger().info(f"Initial turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
 
         square_count = 0
         for square in square_list:
@@ -182,6 +182,16 @@ class gazebo_env:
         self._cylinder_count = 0
 
         return response
+
+    # Genius design
+    def reset_goal_position(self):
+        success_1 = False
+        success_2 = False
+        while not (success_1 and success_2):
+            x, y, rad, radius, pending_list, success_1 = gen_turtle_apt(map_length=12, map_width=12, divison=100, collision_radius=0.11)
+            success_2 = check_turtle_collision(self._obstacle_list, pending_list)
+        self._goal_pos = [x, y]
+        return self._goal_pos
 
     def gazebo_env_destroy(self):
         self.node.destroy_client(self.control_world_cli)
