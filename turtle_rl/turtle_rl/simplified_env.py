@@ -15,7 +15,7 @@ class simplified_env(gym.Env, Node):
         self.get_logger().info("The simplified_env node has just been created.")
         self.ros_gz_interface = ros_gz_interface(self)
         # TODO Make it a ROS parameter
-        self._tolerence = 0.25
+        self._tolerence = 0.10
         self._max_translational_velocity = np.float32(0.22)
         self._max_rotational_vel = np.float32(2.84)
         self._min_detection_distance = np.float32(0.16)
@@ -23,12 +23,12 @@ class simplified_env(gym.Env, Node):
 
         # Action space: 
         # self.action_space = spaces.Box(
-        #     low=np.array([np.float32(0), -self._max_rotational_vel]),
+        #     low=np.array([-self._max_translational_velocity, -self._max_rotational_vel]),
         #     high=np.array([self._max_translational_velocity, self._max_rotational_vel]),
         #     dtype=np.float32
         # )
         self.action_space = spaces.MultiDiscrete(
-            nvec=np.array([12, 17]),
+            nvec=np.array([13, 17]),
             dtype=np.uint8
         )
         # Observation space: 
@@ -63,7 +63,7 @@ class simplified_env(gym.Env, Node):
         # Publish an aciton, action = [linear_x, angular_z]
         # linear_x = action[0]
         # angular_z = action[1]
-        linear_x = action[0] * 0.02
+        linear_x = -0.02 + action[0] * 0.02
         angular_z = -2.84 + action[1] * 0.355
         self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
 
@@ -82,8 +82,6 @@ class simplified_env(gym.Env, Node):
             flag_1 = True
         else:
             flag_1 = False
-        # flag_2 = self.ros_gz_interface.out_of_bound_penalty()
-        # flag_3 = self.ros_gz_interface.obstacle_hit_penalty()
         self.done = flag_1
         terminated = self.done
 
@@ -101,7 +99,7 @@ class simplified_env(gym.Env, Node):
 
         # self.ros_gz_interface = ros_gz_interface(self)
 
-        # Spin once
+        # Spin once to get initial observation and info
         self.spin()
 
         # Get observation and info
@@ -137,15 +135,24 @@ class simplified_env(gym.Env, Node):
 
         if info["distance"] < self._tolerence:
             reward += 2
+            self.get_logger().info(f"The turtlebot is within {self._tolerence} from the goal!")
         elif info["distance"] < 2 * self._tolerence:
             reward += 1
+            self.get_logger().info(f"The turtlebot is within {2 * self._tolerence} from the goal!")
 
-        if self.ros_gz_interface.obstacle_hit_penalty():
-            reward += -1
-            self.get_logger().info("Apply obstacle-hit penalty.")
-        if self.ros_gz_interface.out_of_bound_penalty():
+        if self.ros_gz_interface.out_of_bound_penalty_init():
             reward += -3
-            self.get_logger().info("Apply out-of-bound penalty.")
+            self.get_logger().info("Apply out-of-bound penalty (initial).")
+        if self.ros_gz_interface.obstacle_hit_penalty_init():
+            reward += -2
+            self.get_logger().info("Apply obstacle-hit penalty. (initial)")
+
+        if self.ros_gz_interface.out_of_bound_penalty_grid():
+            reward += -0.01
+            self.get_logger().info("Apply out-of-bound penalty (constant).")
+        if self.ros_gz_interface.obstacle_hit_penalty_grid():
+            reward += -0.01
+            self.get_logger().info("Apply obstacle-hit penalty. (constant)")
 
         return reward
 

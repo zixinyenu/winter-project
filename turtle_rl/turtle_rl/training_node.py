@@ -6,11 +6,12 @@ from stable_baselines3 import PPO
 from stable_baselines3.common import env_checker
 from stable_baselines3.common import callbacks
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.vec_env import DummyVecEnv, VecCheckNan
+# from stable_baselines3.common.vec_env import DummyVecEnv, VecCheckNan
 
 from .simplified_env import simplified_env
 
 import os
+import time
 
 class training_node(Node):
     """training_node class."""
@@ -20,6 +21,8 @@ class training_node(Node):
         self.get_logger().info("The training node has just been created.")
 
         # Parameters
+        self.declare_parameter('training_mode', 'train')
+        self._training_mode = self.get_parameter('training_mode').value
 
 def main(args=None):
     # Initialize training node
@@ -48,11 +51,13 @@ def main(args=None):
     # Make custom environment
     # env = gym.make("Simplified-V0")
 
-    # env = simplified_env()
-    # env = Monitor(env)
+    env = simplified_env()
+    env = Monitor(env)
 
-    env = DummyVecEnv([lambda: simplified_env()])
-    env = VecCheckNan(env, raise_exception=True)
+    # env = DummyVecEnv([lambda: simplified_env()])
+    # env = VecCheckNan(env, raise_exception=True)
+
+    # Reset the environment first
     env.reset()
 
     # Check custom environment to see if it is fine
@@ -69,33 +74,38 @@ def main(args=None):
     #     n_eval_episodes=50
     # )
 
+    # Sleep to wait /set_up_new_episode service done
+    # time.sleep(5)
+
     # Training!
     model = PPO(
         policy="MlpPolicy",
         env=env,
         verbose=1,
         tensorboard_log=logs_dir,
-        learning_rate=0.001
+        learning_rate=0.0001
     )
-    try:
-        # model.learn(
-        #     total_timesteps=int(50000000),
-        #     reset_num_timesteps=False,
-        #     callback=eval_callback,
-        #     tb_log_name=f"{algorithm}"
-        # )
-        TIMESTEPS = 10000
-        for i in range(1, 10):
-            model.learn(
-                total_timesteps=TIMESTEPS,
-                reset_num_timesteps=False,
-                tb_log_name=algorithm
-            )
-            node.get_logger().info(f"Model_{TIMESTEPS*i} has been trained")
+    if node._training_mode == 'train':
+        try:
+            # model.learn(
+            #     total_timesteps=int(50000000),
+            #     reset_num_timesteps=False,
+            #     callback=eval_callback,
+            #     tb_log_name=f"{algorithm}"
+            # )
+
+            TIMESTEPS = 5000000
+            for i in range(1, 10):
+                model.learn(
+                    total_timesteps=TIMESTEPS,
+                    reset_num_timesteps=False,
+                    tb_log_name=algorithm
+                )
+                node.get_logger().info(f"Model_{TIMESTEPS*i} has been trained")
+                model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
+                node.get_logger().info(f"Model_{TIMESTEPS*i} has been saved")
+        except KeyboardInterrupt:
             model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
-            node.get_logger().info(f"Model_{TIMESTEPS*i} has been saved")
-    except KeyboardInterrupt:
-        model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
 
     env.close()
 

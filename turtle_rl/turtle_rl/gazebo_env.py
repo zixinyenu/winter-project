@@ -75,6 +75,8 @@ class gazebo_env:
         self._cylinder_count = 0
         self._goal_pos = [0, 0]
 
+        self._obstacle_list = []
+
     async def control_simulation_callback(self, request, response):
         control_world_request = ControlWorld.Request()
         if self._simulation_paused:
@@ -93,7 +95,8 @@ class gazebo_env:
         episode_num = int(request.episode_num)
         world_path = create_new_world(self._worlds_path, episode_num)
 
-        ol, square_list, rectangle_list, cylinder_list, start_pos, goal_pos= create_map(randomness=3)
+        obstacle_list, square_list, rectangle_list, cylinder_list, start_pos, goal_pos= create_map(randomness=3)
+        self._obstacle_list = obstacle_list
         self._goal_pos = goal_pos
         self.node.get_logger().info(f"Goal position set at ({goal_pos[0]}, {goal_pos[1]})")
 
