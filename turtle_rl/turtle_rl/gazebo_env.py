@@ -189,6 +189,8 @@ class gazebo_env:
         success_2 = False
         while not (success_1 and success_2):
             x, y, rad, radius, pending_list, success_1 = gen_turtle_apt(map_length=12, map_width=12, d=100, collision_radius=0.11)
+            if success_1 == False:
+                continue
             success_2 = check_turtle_collision(self._obstacle_list, pending_list)
         self._goal_pos = [x, y]
         return self._goal_pos

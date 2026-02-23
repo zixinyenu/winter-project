@@ -56,6 +56,13 @@ class ros_gz_interface:
     def reset_goal_position(self):
         new_goal_pos = self.gazebo_environment.reset_goal_position()
         return new_goal_pos
+
+    def obstacle_list_is_initialized(self):
+        obstacle_list = self.gazebo_environment._obstacle_list
+        if len(obstacle_list) == 0:
+            return False
+        else:
+            return True
     ########## ROS_Functions_End ##########
 
     def timer_callback(self):

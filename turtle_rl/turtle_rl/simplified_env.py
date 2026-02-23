@@ -28,7 +28,7 @@ class simplified_env(gym.Env, Node):
         #     dtype=np.float32
         # )
         self.action_space = spaces.MultiDiscrete(
-            nvec=np.array([17, 17]),
+            nvec=np.array([9, 9]),
             dtype=np.uint8
         )
         # Observation space: 
@@ -64,8 +64,8 @@ class simplified_env(gym.Env, Node):
         # Publish an aciton, action = [linear_x, angular_z]
         # linear_x = action[0]
         # angular_z = action[1]
-        linear_x = -0.10 + action[0] * 0.02
-        angular_z = -2.84 + action[1] * 0.355
+        linear_x = -0.10 + action[0] * 0.04
+        angular_z = -2.84 + action[1] * 0.71
         self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
 
         # Spin once
@@ -80,18 +80,19 @@ class simplified_env(gym.Env, Node):
         reward = self.reward
 
         # Check if the turtlebot reaches the goal with a tolerence
-        # After initialization, self.location_observation[0] == 0 will be True briefly
-        if (self.location_observation[0] < self._tolerence) and self.location_observation[0] != 0:
+        # After initialization, self.location_observation[0] will be very close to 0 briefly
+        flag_1 = False
+        if (self.location_observation[0] < self._tolerence) and self.location_observation[0] > 0.01:
             flag_1 = True
-        else:
-            flag_1 = False
+            self.get_logger().info(f"\n {self.location_observation[0]} \n")
         self.done = flag_1
         terminated = self.done
 
         # Check if the episode needs to be truncated (turtlebot hits a fence or an obstacle)
-        flag_2 = self.ros_gz_interface.out_of_bound_penalty_grid()
-        flag_3 = self.ros_gz_interface.obstacle_hit_penalty_grid()
-        self.truncated = flag_2 or flag_3
+        flag_2 = False
+        if self._step_count > 100000:
+            flag_2 = True
+        self.truncated = flag_2
         truncated = self.truncated
 
         # truncated is also False
@@ -111,7 +112,8 @@ class simplified_env(gym.Env, Node):
         self.observation = np.append(self.laser_observation, self.location_observation)
 
         # Reset the goal position
-        if self._step_count != 0:
+        # Skip for the first reset in each map configuration
+        if self._step_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
             new_goal_pos = self.ros_gz_interface.reset_goal_position()
             self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
 
@@ -149,11 +151,11 @@ class simplified_env(gym.Env, Node):
     def compute_rewards(self):
         self.reward = 0
 
-        # After initialization, self.location_observation[0] == 0 will be True briefly
-        if self.location_observation[0] < self._tolerence and self.location_observation[0] != 0:
+        # After initialization, self.location_observation[0] will be very close to 0 briefly
+        if self.location_observation[0] < self._tolerence and self.location_observation[0] > 0.01:
             self.reward += 10
             self.get_logger().info(f"The turtlebot is within {self._tolerence} from the goal!")
-        elif self.location_observation[0] < 2 * self._tolerence and self.location_observation[0] != 0:
+        elif self.location_observation[0] < 2*self._tolerence and self.location_observation[0] > 0.01:
             self.reward += 5
             self.get_logger().info(f"The turtlebot is within {2 * self._tolerence} from the goal!")
 

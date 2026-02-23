@@ -106,6 +106,8 @@ def main(args=None):
                 node.get_logger().info(f"Model_{TIMESTEPS*i} has been saved")
         except KeyboardInterrupt:
             model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
+    elif node._training_mode == 'retrain':
+        pass
 
     env.close()
 
