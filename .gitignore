@@ -1,3 +1,4 @@
 turtle_astar/turtle_astar/__pycache__/
 turtle_rl/models/
 turtle_rl/logs/
+turtle_rl/worlds/world_episode_0/
