@@ -183,18 +183,6 @@ class gazebo_env:
 
         return response
 
-    # Genius design
-    def reset_goal_position(self):
-        success_1 = False
-        success_2 = False
-        while not (success_1 and success_2):
-            x, y, rad, radius, pending_list, success_1 = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
-            if success_1 == False:
-                continue
-            success_2 = check_turtle_collision(self._obstacle_list, pending_list)
-        self._goal_pos = [x, y]
-        return self._goal_pos
-
     def gazebo_env_destroy(self):
         self.node.destroy_client(self.control_world_cli)
         self.node.destroy_client(self.set_entity_pose_cli)

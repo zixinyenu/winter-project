@@ -227,6 +227,7 @@ def create_map(
         divison = 100,
         collision_radius=0.11,
         randomness = 1,
+        border = 1.5
 ):
     i_max = int(map_width*divison + 1)
     j_max = int(map_length*divison + 1)
@@ -315,10 +316,10 @@ def create_map(
     # Obstacles of same type tend to have relatively more different size
     # More realistic for the problem framing of the turtle_rl package
     elif randomness == 3:
-        total = 18
+        total = 14
 
-        square_total = int(np.random.normal(loc=4, scale=1))
-        rectangle_total = int(np.random.normal(loc=10, scale=2))
+        square_total = int(np.random.normal(loc=3, scale=1))
+        rectangle_total = int(np.random.normal(loc=7, scale=2))
         cylinder_total = total - square_total - rectangle_total
 
         small_square_total = np.random.randint(low=1, high=square_total+1)
@@ -402,12 +403,19 @@ def create_map(
         flag = check_turtle_collision(obstacle_list, pending_list)
         if flag:
             continue
+
         if turtle_count == 0:
             turtle_param = [x, y, rad]
+            turtle_count += 1
         else:
-            turtle_goal[0] = x
-            turtle_goal[1] = y
-        turtle_count += 1
+            start_x = turtle_param[0]
+            start_y = turtle_param[1]
+            if ((x - start_x)**2 + (y - start_y)**2)**0.5 <= border:
+                continue
+            else:
+                turtle_goal[0] = x
+                turtle_goal[1] = y
+                turtle_count += 1
 
     return obstacle_list, square_list, rectangle_list, cylinder_list, turtle_param, turtle_goal
 

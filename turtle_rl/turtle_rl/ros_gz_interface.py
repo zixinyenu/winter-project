@@ -32,7 +32,7 @@ class ros_gz_interface:
         self.turtle_environment.cmd_vel_publish(action)
 
     def get_distance_and_bearing(self):
-        return [self._distance, self._bearing]
+        return np.array([self._distance, self._bearing])
 
     def get_laser_readings(self):
         return self.turtle_environment._laser_readings
@@ -53,9 +53,23 @@ class ros_gz_interface:
         self.turtle_environment.turtle_env_destroy()
         self.gazebo_environment.gazebo_env_destroy()
 
-    def reset_goal_position(self):
-        new_goal_pos = self.gazebo_environment.reset_goal_position()
-        return new_goal_pos
+    # Genius design
+    def reset_goal_position(self, border):
+        success_1 = False
+        success_2 = False
+        success_3 = False
+        while not success_3:
+            x, y, rad, radius, pending_list, success_1 = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
+            if success_1 == False:
+                continue
+            success_2 = check_turtle_collision(self.gazebo_environment._obstacle_list, pending_list)
+            if success_2 == False:
+                continue
+            turtle_x = self.turtle_environment._turtle_pos[0]
+            turtle_y = self.turtle_environment._turtle_pos[1]
+            success_3 = ((turtle_x - x)**2 + (turtle_y - y)**2)**0.5 > border
+        self._goal_pos = [x, y]
+        return self._goal_pos
 
     def obstacle_list_is_initialized(self):
         obstacle_list = self.gazebo_environment._obstacle_list
