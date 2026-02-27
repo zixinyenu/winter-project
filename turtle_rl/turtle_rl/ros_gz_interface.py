@@ -1,6 +1,7 @@
 import numpy as np
 
 from rclpy.node import Node
+from example_interfaces.msg import UInt8MultiArray, Float32MultiArray
 
 from .turtle_env import *
 from .gazebo_env import *
@@ -12,7 +13,20 @@ class ros_gz_interface:
         # super().__init__('ros_gz_interface')
         self.node = node
         self.turtle_environment = turtle_env(self.node)
-        self.gazebo_environment = gazebo_env(self.node)
+
+        # Subscriptions
+        self.obstacle_list_sub = self.node.create_subscription(
+            UInt8MultiArray,
+            '/obstacle_list',
+            self.obstacle_list_callback,
+            1
+        )
+        self.goal_pos_sub = self.node.create_subscription(
+            Float32MultiArray,
+            '/goal_pos',
+            self.goal_pos_callback,
+            1
+        )
 
         # Timer
         self.main_timer = self.node.create_timer(
@@ -25,6 +39,8 @@ class ros_gz_interface:
         self._bearing = np.float32(0)
         self._out_of_bound_grid = False
         self._obstacle_hit_grid = False
+        self._obstacle_list = []
+        self._goal_pos = [0.0, 0.0]
 
     ########## ROS_Functions_Start ##########
     # action = [linear_x, angular_z]
@@ -51,7 +67,6 @@ class ros_gz_interface:
 
     def interface_destroy(self):
         self.turtle_environment.turtle_env_destroy()
-        self.gazebo_environment.gazebo_env_destroy()
 
     # Genius design
     def reset_goal_position(self, border):
@@ -62,7 +77,7 @@ class ros_gz_interface:
             x, y, rad, radius, pending_list, success_1 = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
             if success_1 == False:
                 continue
-            success_2 = check_turtle_collision(self.gazebo_environment._obstacle_list, pending_list)
+            success_2 = check_turtle_collision(self._obstacle_list, pending_list)
             if success_2 == False:
                 continue
             turtle_x = self.turtle_environment._turtle_pos[0]
@@ -72,11 +87,23 @@ class ros_gz_interface:
         return self._goal_pos
 
     def obstacle_list_is_initialized(self):
-        obstacle_list = self.gazebo_environment._obstacle_list
-        if len(obstacle_list) == 0:
+        obstacle_list = self._obstacle_list
+        # When the map has not been initialized, obstacle_list has a size of 1
+        # Empty list is not used since it causes error elsewhere
+        if len(obstacle_list) == 1:
             return False
         else:
             return True
+
+    def obstacle_list_callback(self, msg: UInt8MultiArray):
+        tmp_obstacle_list = msg.data
+        obstacle_list = np.zeros(shape=(601, 601), dtype=np.uint8)
+        for idx, i in enumerate(tmp_obstacle_list):
+            obstacle_list[int(idx/601)][idx%601] = i
+        self._obstacle_list = obstacle_list
+
+    def goal_pos_callback(self, msg: UInt8MultiArray):
+        self._goal_pos = msg.data
     ########## ROS_Functions_End ##########
 
     def timer_callback(self):
@@ -85,7 +112,7 @@ class ros_gz_interface:
 
         self._out_of_bound_grid = self._out_of_bound_grid_check()
 
-        obstacle_list = self.gazebo_environment._obstacle_list
+        obstacle_list = self._obstacle_list
         turtle_pending_list = self._create_turtle_pending_list()
         if not self._out_of_bound_grid:
             try:
@@ -94,13 +121,12 @@ class ros_gz_interface:
                 pass
                 # self.node.get_logger().info(f"{e} - Ignore if this appears when the map has not been set up.")
 
-
     ########## Helper_Functions_Start ##########
     def _get_distance_and_bearing(self):
         turtle_x = self.turtle_environment._turtle_pos[0]
         turtle_y = self.turtle_environment._turtle_pos[1]
-        goal_x = self.gazebo_environment._goal_pos[0]
-        goal_y = self.gazebo_environment._goal_pos[1]
+        goal_x = self._goal_pos[0]
+        goal_y = self._goal_pos[1]
         distance = ((goal_x - turtle_x)**2 + (goal_y - turtle_y)**2)**0.5
         bearing = np.arctan2(
             turtle_y - goal_y,

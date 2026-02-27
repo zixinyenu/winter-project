@@ -177,11 +177,11 @@ def gen_cylinder_apt(map_length, map_width, d, mean_radius, noise):
 def check_collision(obstacle_list, pending_list):
     for pixel in pending_list:
         [i, j] = pixel
-        if obstacle_list[i][j] == 1:
+        if obstacle_list[i][j] == np.uint8(1):
             return True
     for pixel in pending_list:
         [i, j] = pixel
-        obstacle_list[i][j] = 1
+        obstacle_list[i][j] = np.uint8(1)
     return False
 
 ########## TURTLE_FUNCTIONS_START ##########
@@ -231,7 +231,7 @@ def create_map(
 ):
     i_max = int(map_width*divison + 1)
     j_max = int(map_length*divison + 1)
-    obstacle_list = np.zeros(shape=(i_max, j_max))
+    obstacle_list = np.zeros(shape=(i_max, j_max), dtype=np.uint8)
     square_list = []
     rectangle_list = []
     cylinder_list = []
@@ -318,9 +318,9 @@ def create_map(
     elif randomness == 3:
         total = 14
 
-        square_total = int(np.random.normal(loc=3, scale=1))
-        rectangle_total = int(np.random.normal(loc=7, scale=2))
-        cylinder_total = total - square_total - rectangle_total
+        square_total = np.clip(int(np.random.normal(loc=3, scale=1)), a_min=1, a_max=None)
+        rectangle_total = np.clip(int(np.random.normal(loc=7, scale=2)), a_min=1, a_max=None)
+        cylinder_total = np.clip(total - square_total - rectangle_total, a_min=1, a_max=None)
 
         small_square_total = np.random.randint(low=1, high=square_total+1)
         big_square_total = square_total - small_square_total

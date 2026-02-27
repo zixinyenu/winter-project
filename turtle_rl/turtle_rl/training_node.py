@@ -11,7 +11,6 @@ from stable_baselines3.common.monitor import Monitor
 from .simplified_env import simplified_env
 
 import os
-import time
 
 class training_node(Node):
     """training_node class."""
@@ -22,11 +21,13 @@ class training_node(Node):
 
         # Parameters
         self.declare_parameter('training_mode', 'train')
+        self.declare_parameter('epoch', 0)
         self._training_mode = self.get_parameter('training_mode').value
+        self._epoch = self.get_parameter('epoch').value
 
 def main(args=None):
     # Initialize training node
-    rclpy.init()
+    rclpy.init(args=args)
     node = training_node()
 
     # Create directories where the trained RL models and logswill be saved
@@ -74,19 +75,17 @@ def main(args=None):
     #     n_eval_episodes=50
     # )
 
-    # Sleep to wait /set_up_new_episode service done
-    # time.sleep(5)
-
     # Training!
-    model = PPO(
-        policy="MlpPolicy",
-        env=env,
-        verbose=1,
-        tensorboard_log=logs_dir,
-        learning_rate=0.00001
-    )
     if node._training_mode == 'train':
         try:
+            model = PPO(
+                policy="MlpPolicy",
+                env=env,
+                verbose=1,
+                tensorboard_log=logs_dir,
+                learning_rate=0.00001
+            )
+
             # model.learn(
             #     total_timesteps=int(50000000),
             #     reset_num_timesteps=False,
@@ -94,20 +93,34 @@ def main(args=None):
             #     tb_log_name=f"{algorithm}"
             # )
 
-            TIMESTEPS = 5000000
-            for i in range(1, 10):
-                model.learn(
-                    total_timesteps=TIMESTEPS,
-                    reset_num_timesteps=False,
-                    tb_log_name=algorithm
-                )
-                node.get_logger().info(f"Model_{TIMESTEPS*i} has been trained")
-                model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
-                node.get_logger().info(f"Model_{TIMESTEPS*i} has been saved")
+            TIMESTEPS = 1000000
+            model.learn(
+                total_timesteps=TIMESTEPS,
+                reset_num_timesteps=False,
+                tb_log_name=algorithm
+            )
+            node.get_logger().info(f"Model {TIMESTEPS} has been trained")
+            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS}")
+            node.get_logger().info(f"Model {TIMESTEPS} has been saved")
         except KeyboardInterrupt:
-            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
+            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS}")
     elif node._training_mode == 'retrain':
-        pass
+        TIMESTEPS = 1000000
+        model_path = f"{models_dir}/{algorithm}/{TIMESTEPS*node._epoch}.zip"
+        model = PPO.load(model_path, env=env)
+        node.get_logger().info(f"Model {TIMESTEPS*(node._epoch)} has been loaded")
+
+        try:
+            model.learn(
+                total_timesteps=TIMESTEPS,
+                reset_num_timesteps=False,
+                tb_log_name=algorithm
+            )
+            node.get_logger().info(f"Model {TIMESTEPS*(node._epoch+1)} has been trained")
+            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*(node._epoch+1)}")
+            node.get_logger().info(f"Model {TIMESTEPS*(node._epoch+1)} has been saved")
+        except KeyboardInterrupt:
+            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*(node._epoch+1)}")
 
     env.close()
 

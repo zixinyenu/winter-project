@@ -75,7 +75,9 @@ class gazebo_env:
         self._cylinder_count = 0
         self._goal_pos = [0, 0]
 
-        self._obstacle_list = []
+        # When the map has not been initialized, obstacle_list has a size of 1
+        # Empty list is not used since it causes error elsewhere
+        self._obstacle_list = [np.uint8(0)]
 
     async def control_simulation_callback(self, request, response):
         control_world_request = ControlWorld.Request()
@@ -95,7 +97,11 @@ class gazebo_env:
         episode_num = int(request.episode_num)
         world_path = create_new_world(self._worlds_path, episode_num)
 
-        obstacle_list, square_list, rectangle_list, cylinder_list, start_pos, goal_pos= create_map(randomness=3)
+        tmp_obstacle_list, square_list, rectangle_list, cylinder_list, start_pos, goal_pos= create_map(randomness=3)
+        obstacle_list = []
+        for row in tmp_obstacle_list:
+            for i in row:
+                obstacle_list.append(i)
         self._obstacle_list = obstacle_list
         self._goal_pos = goal_pos
         self.node.get_logger().info(f"Initial goal position set at ({goal_pos[0]}, {goal_pos[1]})")

@@ -99,7 +99,7 @@ class simplified_env(gym.Env, Node):
 
         # Check if the episode needs to be truncated (turtlebot hits a fence or an obstacle)
         flag_2 = False
-        if self._step_count % 50000 == 0:
+        if self._step_count % 20000 == 0:
             flag_2 = True
         self.truncated = flag_2
         truncated = self.truncated
@@ -167,7 +167,7 @@ class simplified_env(gym.Env, Node):
             self.reward += 80
             self.get_logger().info(f"The turtlebot is within {self._tolerence} from the goal!")
         if self.location_observation[0] > 0.01:
-            self.reward += 0.02*(1.0 - self.location_observation[0]/self._reward_border)
+            self.reward += 0.05*(1.0 - self.location_observation[0]/self._reward_border)
 
         # if self.ros_gz_interface.out_of_bound_penalty_init():
         #     self.reward += -3

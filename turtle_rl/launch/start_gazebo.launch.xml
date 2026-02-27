@@ -71,16 +71,14 @@
         <!--########## Service_Bridge_End ##########-->
     </ros_gz_bridge>
 
-    <executable
+    <!-- <executable
         cmd="/set_up_new_episode turtle_interfaces/srv/SetUpNewEpisode \'episode_num: 0\'"
         cwd="/home"
         launch-prefix="ros2 service call"
         output="screen"
         >
-    </executable>
+    </executable> -->
 
-    <!--
     <node pkg="turtle_rl" exec="gazebo_controller" name="gazebo_controller" />
-    -->
 
 </launch>
