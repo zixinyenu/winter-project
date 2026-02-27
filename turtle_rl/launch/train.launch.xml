@@ -1,7 +1,0 @@
-<launch>
-
-    <arg name="world_name" default="empty" description="Name of the world." />
-    
-    <node pkg="turtle_rl" exec="training_node" name="training_node" />
-
-</launch>
