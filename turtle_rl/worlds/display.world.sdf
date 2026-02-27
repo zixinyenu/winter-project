@@ -1,0 +1,993 @@
+<sdf version='1.12'>
+  <world name='empty'>
+    <physics name='1ms' type='ignored'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
+    <plugin name='gz::sim::systems::UserCommands' filename='gz-sim-user-commands-system'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='gz-sim-scene-broadcaster-system'/>
+    <plugin name='gz::sim::systems::Contact' filename='gz-sim-contact-system'/>
+    <gravity>0 0 -9.8000000000000007</gravity>
+    <magnetic_field>5.5644999999999998e-06 2.2875799999999999e-05 -4.2388400000000002e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <scene>
+      <ambient>0.400000006 0.400000006 0.400000006 1</ambient>
+      <background>0.699999988 0.699999988 0.699999988 1</background>
+      <shadows>true</shadows>
+    </scene>
+    <model name='ground_plane'>
+      <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.800000012 0.800000012 0.800000012 1</ambient>
+            <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
+            <specular>0.800000012 0.800000012 0.800000012 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <pose>0 0 0 0 0 0</pose>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='fence_1'>
+      <plugin filename="gz-sim-touchplugin-system"
+              name="gz::sim::systems::TouchPlugin">
+          <target>turtlebot3_burger</target>
+          <namespace>fence</namespace>
+          <time>0.001</time>
+          <enabled>true</enabled>
+      </plugin>
+      <pose>-3.1 -1.0994676924413233e-07 0.49999932681900072 -1.9602143549339623e-08 -2.4822068816099727e-09 4.907735144525877e-08</pose>
+      <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>
+            <contact>
+                <collision>box_collision</collision>
+            </contact>
+        </sensor>
+        <inertial>
+          <inertia>
+            <ixx>16.666</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>16.666</iyy>
+            <iyz>0</iyz>
+            <izz>16.666</izz>
+          </inertia>
+          <mass>10</mass>
+          <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+          <geometry>
+            <box>
+              <size>0.2 6 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='box_visual'>
+          <geometry>
+            <box>
+              <size>0.2 6 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+      </link>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='fence_2'>
+      <plugin filename="gz-sim-touchplugin-system"
+              name="gz::sim::systems::TouchPlugin">
+          <target>turtlebot3_burger</target>
+          <namespace>fence</namespace>
+          <time>0.001</time>
+          <enabled>true</enabled>
+      </plugin>
+      <pose>3.1 -3.5138676988246148e-07 0.49999914610721918 -4.473583661194936e-08 3.4724102697001128e-10 3.9038962250827841e-08</pose>
+      <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>
+            <contact>
+                <collision>box_collision</collision>
+            </contact>
+        </sensor>
+        <inertial>
+          <inertia>
+            <ixx>16.666</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>16.666</iyy>
+            <iyz>0</iyz>
+            <izz>16.666</izz>
+          </inertia>
+          <mass>10</mass>
+          <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+          <geometry>
+            <box>
+              <size>0.2 6 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='box_visual'>
+          <geometry>
+            <box>
+              <size>0.2 6 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+      </link>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='fence_3'>
+      <plugin filename="gz-sim-touchplugin-system"
+              name="gz::sim::systems::TouchPlugin">
+          <target>turtlebot3_burger</target>
+          <namespace>fence</namespace>
+          <time>0.001</time>
+          <enabled>true</enabled>
+      </plugin>
+      <pose>-1.2624896680003741e-07 3.1 0.49999892895764775 -6.8684635263476807e-09 8.8765153466269893e-08 -8.9611825445029425e-09</pose>
+      <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>
+            <contact>
+                <collision>box_collision</collision>
+            </contact>
+        </sensor>
+        <inertial>
+          <inertia>
+            <ixx>16.666</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>16.666</iyy>
+            <iyz>0</iyz>
+            <izz>16.666</izz>
+          </inertia>
+          <mass>10</mass>
+          <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+          <geometry>
+            <box>
+              <size>6 0.2 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='box_visual'>
+          <geometry>
+            <box>
+              <size>6 0.2 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+      </link>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='fence_4'>
+      <plugin filename="gz-sim-touchplugin-system"
+              name="gz::sim::systems::TouchPlugin">
+          <target>turtlebot3_burger</target>
+          <namespace>fence</namespace>
+          <time>0.001</time>
+          <enabled>true</enabled>
+      </plugin>
+      <pose>3.1165417824908246e-07 -3.1 0.49999908319707276 -4.6068191654925905e-09 -6.3004293022832624e-08 2.8392683620853e-09</pose>
+      <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>
+            <contact>
+                <collision>box_collision</collision>
+            </contact>
+        </sensor>
+        <inertial>
+          <inertia>
+            <ixx>16.666</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>16.666</iyy>
+            <iyz>0</iyz>
+            <izz>16.666</izz>
+          </inertia>
+          <mass>10</mass>
+          <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+          <geometry>
+            <box>
+              <size>6 0.2 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='box_visual'>
+          <geometry>
+            <box>
+              <size>6 0.2 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+      </link>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='cylinder_0'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>0.6914615021173498 1.963044617363221 0.5 0.0 0.0 0.0</pose>
+        <link name='cylinder_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>cylinder_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>11.07496973277691</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>11.07496973277691</iyy>
+            <iyz>0</iyz>
+            <izz>2.149939465553822</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='cylinder_collision'>
+            <geometry>
+            <cylinder>
+                <radius>0.189294279960851</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='cylinder_visual'>
+            <geometry>
+            <cylinder>
+                <radius>0.189294279960851</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='cylinder_1'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>1.169064315733623 0.462959752651976 0.5 0.0 0.0 0.0</pose>
+        <link name='cylinder_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>cylinder_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>11.65682761408987</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>11.65682761408987</iyy>
+            <iyz>0</iyz>
+            <izz>3.313655228179743</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='cylinder_collision'>
+            <geometry>
+            <cylinder>
+                <radius>0.23500550448091434</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='cylinder_visual'>
+            <geometry>
+            <cylinder>
+                <radius>0.23500550448091434</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='cylinder_2'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>-0.7567749456397475 1.212950950221531 0.5 0.0 0.0 0.0</pose>
+        <link name='cylinder_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>cylinder_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>10.307106692471024</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10.307106692471024</iyy>
+            <iyz>0</iyz>
+            <izz>0.6142133849420468</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='cylinder_collision'>
+            <geometry>
+            <cylinder>
+                <radius>0.10117751602522229</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='cylinder_visual'>
+            <geometry>
+            <cylinder>
+                <radius>0.10117751602522229</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='cylinder_3'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>2.4035130023200395 -0.22173195348658048 0.5 0.0 0.0 0.0</pose>
+        <link name='cylinder_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>cylinder_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>16.886137474891783</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>16.886137474891783</iyy>
+            <iyz>0</iyz>
+            <izz>13.772274949783563</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='cylinder_collision'>
+            <geometry>
+            <cylinder>
+                <radius>0.4791011540684556</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='cylinder_visual'>
+            <geometry>
+            <cylinder>
+                <radius>0.4791011540684556</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='cylinder_4'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>-1.517657130198472 -0.7570396718976435 0.5 0.0 0.0 0.0</pose>
+        <link name='cylinder_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>cylinder_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>17.93438798789078</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>17.93438798789078</iyy>
+            <iyz>0</iyz>
+            <izz>15.868775975781562</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='cylinder_collision'>
+            <geometry>
+            <cylinder>
+                <radius>0.5142758010993317</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='cylinder_visual'>
+            <geometry>
+            <cylinder>
+                <radius>0.5142758010993317</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='rectangle_0'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>-1.5365155099828467 1.3051178653790494 0.5 0.0 0.0 -2.9631692617553433</pose>
+        <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>box_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>10.579259405935302</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>15.606772515405023</iyy>
+            <iyz>0</iyz>
+            <izz>6.186031921340325</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+            <geometry>
+            <box>
+                <size>0.7487838483437677 0.2406780849880813 1.0</size>
+            </box>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='box_visual'>
+            <geometry>
+            <box>
+                <size>0.7487838483437677 0.2406780849880813 1.0</size>
+            </box>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='rectangle_1'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>-2.358079136830596 2.2512103755281174 0.5 0.0 0.0 -1.6978826048024123</pose>
+        <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>box_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>10.128264865103311</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>15.594071754957588</iyy>
+            <iyz>0</iyz>
+            <izz>5.722336620060901</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+            <geometry>
+            <box>
+                <size>0.7479352749374499 0.11325407944233727 1.0</size>
+            </box>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='box_visual'>
+            <geometry>
+            <box>
+                <size>0.7479352749374499 0.11325407944233727 1.0</size>
+            </box>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='rectangle_2'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>1.6461038590620554 -0.7253505353026153 0.5 0.0 0.0 1.4514214444828806</pose>
+        <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>box_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>10.492532858054629</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>15.634540381376386</iyy>
+            <iyz>0</iyz>
+            <izz>6.127073239431011</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+            <geometry>
+            <box>
+                <size>0.7506357559679917 0.22193081310503676 1.0</size>
+            </box>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='box_visual'>
+            <geometry>
+            <box>
+                <size>0.7506357559679917 0.22193081310503676 1.0</size>
+            </box>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='rectangle_3'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>-0.14730941170126854 0.9343651756497096 0.5 0.0 0.0 2.224099368875935</pose>
+        <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>box_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>10.220228378679925</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>16.216780224775484</iyy>
+            <iyz>0</iyz>
+            <izz>6.437008603455407</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+            <geometry>
+            <box>
+                <size>0.7884656127425902 0.14840093620995953 1.0</size>
+            </box>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='box_visual'>
+            <geometry>
+            <box>
+                <size>0.7884656127425902 0.14840093620995953 1.0</size>
+            </box>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='rectangle_4'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>0.9176778899190046 -0.09088806963867446 0.5 0.0 0.0 0.1717554160016439</pose>
+        <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>box_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>10.26624197569106</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>15.506716809749683</iyy>
+            <iyz>0</iyz>
+            <izz>5.772958785440744</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+            <geometry>
+            <box>
+                <size>0.7420725577562941 0.16316922984774415 1.0</size>
+            </box>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='box_visual'>
+            <geometry>
+            <box>
+                <size>0.7420725577562941 0.16316922984774415 1.0</size>
+            </box>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='rectangle_5'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>-1.0273199358940344 2.279931360158421 0.5 0.0 0.0 2.198327351442124</pose>
+        <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>box_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>10.47194070420801</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>15.398219990493105</iyy>
+            <iyz>0</iyz>
+            <izz>5.870160694701115</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+            <geometry>
+            <box>
+                <size>0.7347257985461723 0.21724196284512087 1.0</size>
+            </box>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='box_visual'>
+            <geometry>
+            <box>
+                <size>0.7347257985461723 0.21724196284512087 1.0</size>
+            </box>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='square_0'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>1.123615160997315 -2.0959547005354535 0.5 0.0 0.0 2.2761656577365654</pose>
+        <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>box_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>10.1441110092793</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10.1441110092793</iyy>
+            <iyz>0</iyz>
+            <izz>0.28822201855859825</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+            <geometry>
+            <box>
+                <size>0.12004624495555832 0.12004624495555832 1.0</size>
+            </box>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='box_visual'>
+            <geometry>
+            <box>
+                <size>0.12004624495555832 0.12004624495555832 1.0</size>
+            </box>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='square_1'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>2.1618730275417786 2.0679720524461906 0.5 0.0 0.0 1.9114014506905086</pose>
+        <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>box_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>11.416909344801493</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>11.416909344801493</iyy>
+            <iyz>0</iyz>
+            <izz>2.833818689602989</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+            <geometry>
+            <box>
+                <size>0.3764185628793424 0.3764185628793424 1.0</size>
+            </box>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='box_visual'>
+            <geometry>
+            <box>
+                <size>0.3764185628793424 0.3764185628793424 1.0</size>
+            </box>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <model name='square_2'>
+        <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>-1.4596833712175001 2.1451760965976217 0.5 0.0 0.0 -0.4625833065795044</pose>
+        <link name='box_link'>
+        <sensor name='sensor_contact' type='contact'>          <contact>              <collision>box_collision</collision>          </contact>      </sensor>      <inertial>
+            <inertia>
+            <ixx>11.884495369696902</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>11.884495369696902</iyy>
+            <iyz>0</iyz>
+            <izz>3.7689907393938036</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+            <geometry>
+            <box>
+                <size>0.43410774811063924 0.43410774811063924 1.0</size>
+            </box>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='box_visual'>
+            <geometry>
+            <box>
+                <size>0.43410774811063924 0.43410774811063924 1.0</size>
+            </box>
+            </geometry>
+            <material>
+            <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+            <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+            <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+    <light name='sun' type='directional'>
+      <pose>0 0 10 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1</intensity>
+      <direction>-0.5 0.10000000000000001 -0.90000000000000002</direction>
+      <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
+      <specular>0.200000003 0.200000003 0.200000003 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <linear>0.01</linear>
+        <constant>0.90000000000000002</constant>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+  </world>
+</sdf>

@@ -38,6 +38,7 @@ setup(
         ('share/' + package_name, ['launch/turtle_rviz.launch.xml']),
         ('share/' + package_name, ['launch/turtle.launch.xml']),
         ('share/' + package_name, ['launch/start_gazebo.launch.xml']),
+        ('share/' + package_name, ['launch/display.launch.xml']),
         ('share/' + package_name, ['launch/train.launch.xml']),
         ('share/' + package_name, ['launch/retrain.launch.xml']),
         *recursive_files('share/' + package_name, 'meshes'),
@@ -60,6 +61,7 @@ setup(
             'simplified_environment = turtle_rl.simplified_env:main',
             'gazebo_controller = turtle_rl.gazebo_controller:main',
             'training_node = turtle_rl.training_node:main',
+            'displaying_node = turtle_rl.displaying_node:main',
         ],
     },
 )

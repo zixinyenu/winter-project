@@ -91,7 +91,8 @@ class ros_gz_interface:
             try:
                 self._obstacle_hit_grid = check_turtle_collision(obstacle_list, turtle_pending_list)
             except IndexError as e:
-                self.node.get_logger().info(f"{e} - Ignore if this appears when the map has not been set up.")
+                pass
+                # self.node.get_logger().info(f"{e} - Ignore if this appears when the map has not been set up.")
 
 
     ########## Helper_Functions_Start ##########

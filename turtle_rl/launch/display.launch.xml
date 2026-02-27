@@ -1,0 +1,74 @@
+<launch>
+
+    <arg name="world" default="$(find-pkg-share turtle_rl)/worlds/display.world.sdf" description="World sdf file path." />
+    <arg name="world_name" default="empty" description="Name of the world." />
+    <arg name="gz_gui_config" default="$(find-pkg-share turtle_rl)/gazebo_gui.config" description="Gazebo GUI configuration." />
+    <arg name="view_only" default="false" description="True to view Rviz, default as false" />
+
+    <include file="$(find-pkg-share turtle_rl)/turtle_rviz.launch.xml">
+        <arg name="view_only" value="$(var view_only)"/>
+    </include>
+
+    <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
+        <arg name="gz_args" value="-r $(var world) --gui-config $(var gz_gui_config)"/>
+    </include>
+
+    <node pkg="ros_gz_sim" exec="create" name="create_turtle" output="screen">
+        <param name="topic" value="/robot_description"/>
+        <!--Set to unfeasible values. Will be overridden upon the setting-up of first episode.-->
+        <param name="x" value="0.0"/>
+        <param name="y" value="-1.0"/>
+        <param name="z" value="0.0"/>
+        <param name="R" value="0.0"/>
+        <param name="P" value="0.0"/>
+        <param name="Y" value="0.0"/>
+    </node>
+
+    <ros_gz_bridge bridge_name="bridge">
+        <!--########## ROS_to_GZ_Bridge_Start ##########-->
+        <topic ros_topic_name="/cmd_vel" gz_topic_name="/cmd_vel"
+            ros_type_name="geometry_msgs/msg/Twist" gz_type_name="gz.msgs.Twist"
+            direction="ROS_TO_GZ" />
+        <!--########## ROS_to_GZ_Bridge_End ##########-->
+
+        <!--########## Bidirectional_Bridge_Start ##########-->
+        <topic ros_topic_name="/joint_states" gz_topic_name="/joint_states"
+            ros_type_name="sensor_msgs/msg/JointState" gz_type_name="gz.msgs.Model"
+            direction="BIDIRECTIONAL" />
+        <!--########## Bidirectional_Bridge_End ##########-->
+
+        <!--########## GZ_to_ROS_Bridge_Start ##########-->
+        <topic ros_topic_name="/odom" gz_topic_name="/odom"
+            ros_type_name="nav_msgs/msg/Odometry" gz_type_name="gz.msgs.Odometry"
+            direction="GZ_TO_ROS" />
+        <topic ros_topic_name="/scan" gz_topic_name="/scan"
+            ros_type_name="sensor_msgs/msg/LaserScan" gz_type_name="gz.msgs.LaserScan"
+            direction="GZ_TO_ROS" />
+        <topic ros_topic_name="/groundtruth_pose" gz_topic_name="/turtlebot3_burger/pose_static"
+            ros_type_name="tf2_msgs/msg/TFMessage" gz_type_name="gz.msgs.Pose_V"
+            direction="GZ_TO_ROS" />
+        <topic ros_topic_name="/fence/touched" gz_topic_name="/fence/touched"
+            ros_type_name="std_msgs/msg/Bool" gz_type_name="gz.msgs.Boolean"
+            direction="GZ_TO_ROS" />
+        <topic ros_topic_name="/obstacle/touched" gz_topic_name="/obstacle/touched"
+            ros_type_name="std_msgs/msg/Bool" gz_type_name="gz.msgs.Boolean"
+            direction="GZ_TO_ROS" />
+        <!--########## GZ_to_ROS_Bridge_End ##########-->
+
+        <!--########## Service_Bridge_Start ##########-->
+        <service service_name="/world/$(var world_name)/control"
+                ros_type_name="ros_gz_interfaces/srv/ControlWorld"
+                gz_req_type_name="gz.msgs.WorldControl" gz_rep_type_name="gz.msgs.Boolean" />
+        <service service_name="/world/$(var world_name)/set_pose"
+                ros_type_name="ros_gz_interfaces/srv/SetEntityPose"
+                gz_req_type_name="gz.msgs.Pose" gz_rep_type_name="gz.msgs.Boolean" />
+        <service service_name="/world/$(var world_name)/create"
+                ros_type_name="ros_gz_interfaces/srv/SpawnEntity"
+                gz_req_type_name="gz.msgs.EntityFactory" gz_rep_type_name="gz.msgs.Boolean" />
+        <service service_name="/world/$(var world_name)/remove"
+                ros_type_name="ros_gz_interfaces/srv/DeleteEntity"
+                gz_req_type_name="gz.msgs.Entity" gz_rep_type_name="gz.msgs.Boolean" />
+        <!--########## Service_Bridge_End ##########-->
+    </ros_gz_bridge>
+
+</launch>
