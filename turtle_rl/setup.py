@@ -39,7 +39,6 @@ setup(
         ('share/' + package_name, ['launch/turtle.launch.xml']),
         ('share/' + package_name, ['launch/start_gazebo.launch.xml']),
         ('share/' + package_name, ['launch/display.launch.xml']),
-        ('share/' + package_name, ['launch/train.launch.xml']),
         *recursive_files('share/' + package_name, 'meshes'),
         *recursive_files('share/' + package_name, 'worlds'),
     ],

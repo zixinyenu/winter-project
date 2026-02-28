@@ -156,6 +156,7 @@ class gazebo_env:
         self.node.get_logger().info("Cylinders all created successfully.")
         self._cylinder_count = cylinder_count
 
+        response.success = True
         return response
 
     async def delete_all_obstacles_callback(self, request, response):
