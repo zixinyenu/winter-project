@@ -33,7 +33,7 @@ class simplified_env(gym.Env, Node):
         )
         # Observation space: 
         obs_low = np.append(
-            np.array([self._min_detection_distance - np.float32(0.1)]*36),
+            np.array([np.float32(0.06)]*36),
             np.array([np.float32(0), np.float32(-np.pi)])
         )
         obs_high = np.append(

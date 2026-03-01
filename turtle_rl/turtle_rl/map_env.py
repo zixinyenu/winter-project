@@ -316,10 +316,10 @@ def create_map(
     # Obstacles of same type tend to have relatively more different size
     # More realistic for the problem framing of the turtle_rl package
     elif randomness == 3:
-        total = 14
+        total = 18
 
         square_total = np.clip(int(np.random.normal(loc=3, scale=1)), a_min=1, a_max=None)
-        rectangle_total = np.clip(int(np.random.normal(loc=7, scale=2)), a_min=1, a_max=None)
+        rectangle_total = np.clip(int(np.random.normal(loc=10, scale=2)), a_min=1, a_max=None)
         cylinder_total = np.clip(total - square_total - rectangle_total, a_min=1, a_max=None)
 
         small_square_total = np.random.randint(low=1, high=square_total+1)
