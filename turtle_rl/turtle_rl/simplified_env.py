@@ -167,7 +167,7 @@ class simplified_env(gym.Env, Node):
             self.reward += 80
             self.get_logger().info(f"The turtlebot is within {self._tolerence} from the goal!")
         if self.location_observation[0] > 0.01:
-            self.reward += 0.05*(1.0 - self.location_observation[0]/self._reward_border)
+            self.reward += 0.03*(1.0 - self.location_observation[0]/self._reward_border)
 
         # if self.ros_gz_interface.out_of_bound_penalty_init():
         #     self.reward += -3
@@ -176,8 +176,8 @@ class simplified_env(gym.Env, Node):
         #     self.reward += -2
         #     self.get_logger().info("Apply obstacle-hit penalty. (initial)")
 
-        if self.ros_gz_interface.out_of_bound_penalty_grid():
-            self.reward += -0.03
+        # if self.ros_gz_interface.out_of_bound_penalty_grid():
+        #     self.reward += -0.03
             # self.get_logger().info("Apply out-of-bound penalty (constant).")
         if self.ros_gz_interface.obstacle_hit_penalty_grid():
             self.reward += -0.01

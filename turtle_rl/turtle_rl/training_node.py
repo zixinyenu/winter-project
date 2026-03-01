@@ -83,7 +83,7 @@ def main(args=None):
                 env=env,
                 verbose=1,
                 tensorboard_log=logs_dir,
-                learning_rate=0.00001
+                learning_rate=0.0001
             )
 
             # model.learn(
@@ -93,7 +93,7 @@ def main(args=None):
             #     tb_log_name=f"{algorithm}"
             # )
 
-            TIMESTEPS = 1000000
+            TIMESTEPS = 100000
             model.learn(
                 total_timesteps=TIMESTEPS,
                 reset_num_timesteps=False,
@@ -105,7 +105,7 @@ def main(args=None):
         except KeyboardInterrupt:
             model.save(f"{models_dir}/{algorithm}/{TIMESTEPS}")
     elif node._training_mode == 'retrain':
-        TIMESTEPS = 1000000
+        TIMESTEPS = 100000
         model_path = f"{models_dir}/{algorithm}/{TIMESTEPS*node._epoch}.zip"
         model = PPO.load(model_path, env=env)
         node.get_logger().info(f"Model {TIMESTEPS*(node._epoch)} has been loaded")
