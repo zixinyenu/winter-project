@@ -176,8 +176,8 @@ class simplified_env(gym.Env, Node):
         #     self.reward += -2
         #     self.get_logger().info("Apply obstacle-hit penalty. (initial)")
 
-        # if self.ros_gz_interface.out_of_bound_penalty_grid():
-        #     self.reward += -0.03
+        if self.ros_gz_interface.out_of_bound_penalty_grid():
+            self.reward += -0.01
             # self.get_logger().info("Apply out-of-bound penalty (constant).")
         if self.ros_gz_interface.obstacle_hit_penalty_grid():
             self.reward += -0.01

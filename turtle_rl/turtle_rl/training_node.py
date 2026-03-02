@@ -83,7 +83,7 @@ def main(args=None):
                 env=env,
                 verbose=1,
                 tensorboard_log=logs_dir,
-                learning_rate=0.0001
+                learning_rate=0.005
             )
 
             # model.learn(
