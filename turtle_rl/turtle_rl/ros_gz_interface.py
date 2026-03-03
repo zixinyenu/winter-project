@@ -41,6 +41,7 @@ class ros_gz_interface:
         self._obstacle_hit_grid = False
         self._obstacle_list = []
         self._goal_pos = [0.0, 0.0]
+        self._goal_pos_buffer = [-4.0, -4.0]
 
     ########## ROS_Functions_Start ##########
     # action = [linear_x, angular_z]
@@ -102,8 +103,12 @@ class ros_gz_interface:
             obstacle_list[int(idx/601)][idx%601] = i
         self._obstacle_list = obstacle_list
 
-    def goal_pos_callback(self, msg: UInt8MultiArray):
-        self._goal_pos = msg.data
+    def goal_pos_callback(self, msg: Float32MultiArray):
+        goal_x = float(msg.data[0])
+        goal_y = float(msg.data[1])
+        if self._goal_pos_buffer[0] != goal_x or self._goal_pos_buffer[1] != goal_y:
+            self._goal_pos = [goal_x, goal_y]
+            self._goal_pos_buffer = [goal_x, goal_y]
     ########## ROS_Functions_End ##########
 
     def timer_callback(self):
