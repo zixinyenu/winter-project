@@ -2,7 +2,7 @@ import rclpy
 import gymnasium as gym
 from rclpy.node import Node
 from gymnasium.envs import registration
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, TD3
 from stable_baselines3.common import env_checker
 from stable_baselines3.common import callbacks
 from stable_baselines3.common.monitor import Monitor
@@ -31,7 +31,7 @@ def main(args=None):
     node = training_node()
 
     # Create directories where the trained RL models and logswill be saved
-    algorithm = "PPO"
+    algorithm = "TD3"
     models_dir = f"/home/zixin/ws/winter_project/src/turtle_rl/models"
     logs_dir = f"/home/zixin/ws/winter_project/src/turtle_rl/logs"
 
@@ -65,32 +65,23 @@ def main(args=None):
     # env_checker.check_env(env)
     # node.get_logger().info("The simplified_env has been checked.")
 
-    # Create callbacks needed for training
-    # stop_callback = callbacks.StopTrainingOnRewardThreshold(reward_threshold=1500, verbose=1)
-    # eval_callback = callbacks.EvalCallback(
-    #     eval_env=env,
-    #     callback_on_new_best=stop_callback,
-    #     eval_freq=100000,
-    #     best_model_save_path=models_dir,
-    #     n_eval_episodes=50
-    # )
-
     # Training!
     if node._training_mode == 'train':
         try:
-            model = PPO(
+            model = TD3(
                 policy="MlpPolicy",
                 env=env,
                 verbose=1,
                 tensorboard_log=logs_dir,
-                learning_rate=0.005
+                learning_rate=0.001
             )
 
-            # model.learn(
-            #     total_timesteps=int(50000000),
-            #     reset_num_timesteps=False,
-            #     callback=eval_callback,
-            #     tb_log_name=f"{algorithm}"
+            # model = PPO(
+            #     policy="MlpPolicy",
+            #     env=env,
+            #     verbose=1,
+            #     tensorboard_log=logs_dir,
+            #     learning_rate=0.005
             # )
 
             TIMESTEPS = 100000
@@ -107,7 +98,7 @@ def main(args=None):
     elif node._training_mode == 'retrain':
         TIMESTEPS = 100000
         model_path = f"{models_dir}/{algorithm}/{TIMESTEPS*node._epoch}.zip"
-        model = PPO.load(model_path, env=env)
+        model = TD3.load(model_path, env=env)
         node.get_logger().info(f"Model {TIMESTEPS*(node._epoch)} has been loaded")
 
         try:

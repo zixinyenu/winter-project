@@ -2,7 +2,7 @@ import rclpy
 import numpy as np
 import gymnasium as gym
 from rclpy.node import Node
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, TD3
 
 from .ros_gz_interface import *
 from .simplified_env import simplified_env
@@ -48,10 +48,10 @@ class displaying_node(Node):
 
         env = simplified_env()
         env.reset()
-        models_dir = "/home/zixin/ws/winter_project/src/turtle_rl/models/PPO"
-        model_path = f"{models_dir}/5000000.zip"
+        models_dir = "/home/zixin/2025WINTER/ME499/winter_project_files/models/TD3"
+        model_path = f"{models_dir}/14000000.zip"
         self.env = env
-        self.model = PPO.load(model_path, env=env)
+        self.model = TD3.load(model_path, env=env)
 
         self._turtle_pos = np.array([np.float32(0), np.float32(0)])
         self._turtle_ori = np.float32(0)

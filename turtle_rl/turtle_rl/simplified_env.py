@@ -22,15 +22,15 @@ class simplified_env(gym.Env, Node):
         self._max_detection_distance = np.float32(8.0) # Not used
 
         # Action space: 
-        # self.action_space = spaces.Box(
-        #     low=np.array([-self._max_translational_velocity, -self._max_rotational_vel]),
-        #     high=np.array([self._max_translational_velocity, self._max_rotational_vel]),
-        #     dtype=np.float32
-        # )
-        self.action_space = spaces.MultiDiscrete(
-            nvec=np.array([2, 9]),
-            dtype=np.uint8
+        self.action_space = spaces.Box(
+            low=np.array([-self._max_translational_velocity, -self._max_rotational_vel]),
+            high=np.array([self._max_translational_velocity, self._max_rotational_vel]),
+            dtype=np.float32
         )
+        # self.action_space = spaces.MultiDiscrete(
+        #     nvec=np.array([2, 9]),
+        #     dtype=np.uint8
+        # )
         # Observation space: 
         obs_low = np.append(
             np.array([np.float32(0.06)]*36),
@@ -68,13 +68,13 @@ class simplified_env(gym.Env, Node):
         self._step_count += 1
 
         # Publish an aciton, action = [linear_x, angular_z]
-        # linear_x = action[0]
-        # angular_z = action[1]
-        if action[0] == 0:
-            linear_x = 0.22
-        else:
-            linear_x = -0.12
-        angular_z = -2.84 + action[1] * 0.71
+        linear_x = action[0]
+        angular_z = action[1]
+        # if action[0] == 0:
+        #     linear_x = 0.22
+        # else:
+        #     linear_x = -0.12
+        # angular_z = -2.84 + action[1] * 0.71
         self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
 
         # Spin once

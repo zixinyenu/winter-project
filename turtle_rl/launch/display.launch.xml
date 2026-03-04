@@ -16,8 +16,8 @@
     <node pkg="ros_gz_sim" exec="create" name="create_turtle" output="screen">
         <param name="topic" value="/robot_description"/>
         <!--Set to unfeasible values. Will be overridden upon the setting-up of first episode.-->
-        <param name="x" value="0.0"/>
-        <param name="y" value="-1.0"/>
+        <param name="x" value="1.0"/>
+        <param name="y" value="1.0"/>
         <param name="z" value="0.0"/>
         <param name="R" value="0.0"/>
         <param name="P" value="0.0"/>
