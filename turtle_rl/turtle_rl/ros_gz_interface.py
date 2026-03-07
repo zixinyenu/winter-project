@@ -40,7 +40,8 @@ class ros_gz_interface:
         self._out_of_bound_grid = False
         self._obstacle_hit_grid = False
         self._obstacle_list = []
-        self._goal_pos = [-4.0, -4.0]
+        self._goal_pos = [-5.0, -5.0]
+        self.goal_pos_buffer = [-6.0, -6.0]
 
     ########## ROS_Functions_Start ##########
     # action = [linear_x, angular_z]
@@ -69,21 +70,13 @@ class ros_gz_interface:
         self.turtle_environment.turtle_env_destroy()
 
     # Genius design
-    def reset_goal_position(self, border):
-        success_1 = False
-        success_2 = False
-        success_3 = False
-        while not success_3:
-            x, y, rad, radius, pending_list, success_1 = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
-            if success_1 == False:
-                continue
-            success_2 = check_turtle_collision(self._obstacle_list, pending_list)
-            if success_2 == False:
-                continue
-            turtle_x = self.turtle_environment._turtle_pos[0]
-            turtle_y = self.turtle_environment._turtle_pos[1]
-            success_3 = ((turtle_x - x)**2 + (turtle_y - y)**2)**0.5 > border
-        self._goal_pos = [x, y]
+    def reset_goal_position(self):
+        has_collision = True
+        while has_collision:
+            x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
+            has_collision = check_turtle_collision(self._obstacle_list, pending_list)
+        self._goal_pos[0] = x
+        self._goal_pos[1] = y
         return self._goal_pos
 
     def obstacle_list_is_initialized(self):
@@ -105,7 +98,11 @@ class ros_gz_interface:
     def goal_pos_callback(self, msg: Float32MultiArray):
         goal_x = float(msg.data[0])
         goal_y = float(msg.data[1])
-        self._goal_pos = [goal_x, goal_y]
+        if self.goal_pos_buffer[0] != goal_x or self.goal_pos_buffer[1] != goal_y:
+            self._goal_pos[0] = goal_x
+            self._goal_pos[1] = goal_y
+            self.goal_pos_buffer[0] = goal_x
+            self.goal_pos_buffer[1] = goal_y
     ########## ROS_Functions_End ##########
 
     def timer_callback(self):
@@ -130,10 +127,7 @@ class ros_gz_interface:
         goal_x = self._goal_pos[0]
         goal_y = self._goal_pos[1]
         distance = ((goal_x - turtle_x)**2 + (goal_y - turtle_y)**2)**0.5
-        bearing = np.arctan2(
-            turtle_y - goal_y,
-            turtle_x - goal_x
-        )
+        bearing = np.arctan2(turtle_x - goal_x, turtle_y - goal_y)
         return np.float32(distance), np.float32(bearing)
 
     def _out_of_bound_grid_check(self, map_length=6, map_width=6, collision_raidus=0.11):

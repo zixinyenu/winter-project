@@ -39,12 +39,9 @@ class gazebo_controller(Node):
         msg_ol.data = self.gazebo_controller._obstacle_list
         self.obstacle_list_pub.publish(msg_ol)
 
-        if self.gazebo_controller._goal_pos[0] != self._goal_pos_buffer[0] or \
-           self.gazebo_controller._goal_pos[1] != self._goal_pos_buffer[1]:
-            msg_gp = Float32MultiArray()
-            msg_gp.data = self.gazebo_controller._goal_pos
-            self.goal_pos_pub.publish(msg_gp)
-            self._goal_pos_buffer = self.gazebo_controller._goal_pos
+        msg_gp = Float32MultiArray()
+        msg_gp.data = self.gazebo_controller._goal_pos
+        self.goal_pos_pub.publish(msg_gp)
 
 
 def main(args=None):

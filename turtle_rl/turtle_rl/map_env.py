@@ -186,22 +186,17 @@ def check_collision(obstacle_list, pending_list):
 
 ########## TURTLE_FUNCTIONS_START ##########
 def gen_turtle_apt(map_length, map_width, d, collision_radius):
-    x = np.random.uniform(low=-map_length/2, high=map_length/2)
-    y = np.random.uniform(low=-map_width/2, high=map_width/2)
+    x = np.random.uniform(low=-map_length/2 + collision_radius, high=map_length/2 - collision_radius)
+    y = np.random.uniform(low=-map_width/2 + collision_radius, high=map_width/2 - collision_radius)
     radius = collision_radius
 
     pending_list = []
-    success = True
 
     ystart = y-radius
     xstart = x-radius
     ystop = (y+radius)+(1/d)
     xstop = (x+radius)+(1/d)
 
-    if ystart < -map_width/2 or xstart < -map_length/2 or \
-        ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
-        success = False
-        return 4, 4, 6.28, -1, [], success
     for yp in np.arange(start=ystart, stop=ystop, step=1/d):
         for xp in np.arange(start=xstart, stop=xstop, step=1/d):
             if (yp - y)**2 + (xp-x)**2 > radius**2:
@@ -211,7 +206,7 @@ def gen_turtle_apt(map_length, map_width, d, collision_radius):
 
     rad = np.random.uniform(low=-np.pi, high=np.pi)
 
-    return x, y, rad, radius, pending_list, success
+    return x, y, rad, radius, pending_list, True
 
 def check_turtle_collision(obstacle_list, pending_list):
     for pixel in pending_list:

@@ -53,11 +53,8 @@ class simplified_env(gym.Env, Node):
 
         self._step_count = 0
         self._episode_count = 0
-        self._helper_count_1 = -1
-        self._helper_count_2 = -1
-        self._helper_count_3 = -1
-        self._helper_count_4 = -1
         self._reward_border = 2*np.sqrt(2)
+        self._success_count = 0
 
         self.laser_observation = np.array([np.float32(9)]*18)
         self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
@@ -73,7 +70,7 @@ class simplified_env(gym.Env, Node):
         if action[0] == 0:
             linear_x = 0.22
         else:
-            linear_x = -0.22
+            linear_x = -0.11
         angular_z = -2.84 + action[1] * 1.42
         self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
 
@@ -93,19 +90,21 @@ class simplified_env(gym.Env, Node):
         flag_1 = False
         if (self.location_observation[0] < self._tolerence) and self.location_observation[0] > 0.01:
             flag_1 = True
-            self.get_logger().info(f"\n {self.location_observation[0]} \n")
+            self._success_count += 1
+            self.get_logger().info(f"{self.location_observation[0]} \n")
         self.done = flag_1
         terminated = self.done
 
         # Check if the episode needs to be truncated
         flag_2 = False
-        if self._step_count % 10000 == 0:
+        if self._step_count % 20000 == 0 and self._success_count >= 10:
             flag_2 = True
         self.truncated = flag_2
         truncated = self.truncated
 
-        # truncated is also False
-        truncated = self.truncated
+        # # Debug
+        # if self._step_count % 1000 == 0:
+        #     self.get_logger().info(f"{self.ros_gz_interface._bearing}")
 
         return observation, reward, terminated, truncated, info
 
@@ -116,17 +115,16 @@ class simplified_env(gym.Env, Node):
         self.done = False
         self.truncated = False
 
-        # self.laser_observation = np.array([np.float32(9)]*18)
-        # self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
-        # self.observation = np.append(self.laser_observation, self.location_observation)
+        self.laser_observation = np.array([np.float32(9)]*18)
+        self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
+        self.observation = np.append(self.laser_observation, self.location_observation)
 
         # # Reset the goal position
         # # Skip for the first reset in each map configuration
-        # if self._step_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
-        #     new_goal_pos = self.ros_gz_interface.reset_goal_position(border=1.5)
-        #     self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
-        #     self._episode_count += 1
-        self._episode_count += 1
+        if self._step_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
+            new_goal_pos = self.ros_gz_interface.reset_goal_position()
+            self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
+            self._episode_count += 1
 
         # Spin once to get initial observation and info
         self.spin()
