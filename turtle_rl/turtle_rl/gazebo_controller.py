@@ -31,14 +31,21 @@ class gazebo_controller(Node):
             self.timer_callback
         )
 
+        # Non-ROS variables
+        self._goal_pos_buffer = [-4.0, -4.0]
+
     def timer_callback(self):
         msg_ol = UInt8MultiArray()
         msg_ol.data = self.gazebo_controller._obstacle_list
         self.obstacle_list_pub.publish(msg_ol)
 
-        msg_gp = Float32MultiArray()
-        msg_gp.data = self.gazebo_controller._goal_pos
-        self.goal_pos_pub.publish(msg_gp)
+        if self.gazebo_controller._goal_pos[0] != self._goal_pos_buffer[0] or \
+           self.gazebo_controller._goal_pos[1] != self._goal_pos_buffer[1]:
+            msg_gp = Float32MultiArray()
+            msg_gp.data = self.gazebo_controller._goal_pos
+            self.goal_pos_pub.publish(msg_gp)
+            self._goal_pos_buffer = self.gazebo_controller._goal_pos
+
 
 def main(args=None):
     rclpy.init(args=args)

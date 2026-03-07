@@ -66,6 +66,11 @@ class gazebo_env:
             '/delete_all_obstacles',
             callback=self.delete_all_obstacles_callback
         )
+        self.set_up_empty_world_ser = self.node.create_service(
+            Empty,
+            '/set_up_empty_world',
+            callback=self.set_up_empty_world_callback
+        )
 
         # Non-ROS variables
         self._simulation_paused = False
@@ -157,6 +162,28 @@ class gazebo_env:
         self._cylinder_count = cylinder_count
 
         response.success = True
+        return response
+
+    async def set_up_empty_world_callback(self,  request, response):
+        tmp_obstacle_list, goal_pos = create_empty_map()
+        obstacle_list = []
+        for row in tmp_obstacle_list:
+            for i in row:
+                obstacle_list.append(i)
+        self._obstacle_list = obstacle_list
+        self._goal_pos = goal_pos
+        self.node.get_logger().info(f"Goal position set at ({goal_pos[0]}, {goal_pos[1]})")
+
+        start_pos = [0.0, 0.0, 0.0]
+        set_pose_request = SetEntityPose.Request()
+        set_pose_request.entity.name = "turtlebot3_burger"
+        set_pose_request.pose.position.x = start_pos[0]
+        set_pose_request.pose.position.y = start_pos[1]
+        set_pose_request.pose.position.z = 0.0
+        set_pose_request.pose.orientation.z = start_pos[2]
+        result = await self.set_entity_pose_cli.call_async(set_pose_request)
+        self.node.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
+
         return response
 
     async def delete_all_obstacles_callback(self, request, response):

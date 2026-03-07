@@ -31,7 +31,7 @@ def main(args=None):
     node = training_node()
 
     # Create directories where the trained RL models and logswill be saved
-    algorithm = "TD3"
+    algorithm = "PPO"
     models_dir = f"/home/zixin/ws/winter_project/src/turtle_rl/models"
     logs_dir = f"/home/zixin/ws/winter_project/src/turtle_rl/logs"
 
@@ -41,50 +41,39 @@ def main(args=None):
     if not os.path.exists(logs_dir):
         os.makedirs(logs_dir)
 
-    # Register custom environment
-    # registration.register(
-    #     id="Simplified-V0",
-    #     entry_point="turtle_rl.simplified_env:simplified_env",
-    #     max_episode_steps=150
-    # )
-    # node.get_logger().info("The simplified_env has been resgistered successfully.")
-
-    # Make custom environment
-    # env = gym.make("Simplified-V0")
-
     env = simplified_env()
     env = Monitor(env)
 
+        # Check not a number errors
     # env = DummyVecEnv([lambda: simplified_env()])
     # env = VecCheckNan(env, raise_exception=True)
+        # Check custom environment to see if it is fine
+    # env_checker.check_env(env)
+    # node.get_logger().info("The simplified_env has been checked.")
 
     # Reset the environment first
     env.reset()
 
-    # Check custom environment to see if it is fine
-    # env_checker.check_env(env)
-    # node.get_logger().info("The simplified_env has been checked.")
-
     # Training!
     if node._training_mode == 'train':
         try:
-            model = TD3(
-                policy="MlpPolicy",
-                env=env,
-                verbose=1,
-                tensorboard_log=logs_dir,
-                learning_rate=0.001
-            )
-
-            # model = PPO(
+            # model = TD3(
             #     policy="MlpPolicy",
             #     env=env,
             #     verbose=1,
             #     tensorboard_log=logs_dir,
-            #     learning_rate=0.005
+            #     learning_rate=0.001
             # )
 
-            TIMESTEPS = 100000
+            model = PPO(
+                policy="MlpPolicy",
+                env=env,
+                verbose=1,
+                tensorboard_log=logs_dir,
+                learning_rate=0.0003
+            )
+
+            TIMESTEPS = 50000
             model.learn(
                 total_timesteps=TIMESTEPS,
                 reset_num_timesteps=False,
@@ -96,9 +85,9 @@ def main(args=None):
         except KeyboardInterrupt:
             model.save(f"{models_dir}/{algorithm}/{TIMESTEPS}")
     elif node._training_mode == 'retrain':
-        TIMESTEPS = 100000
+        TIMESTEPS = 50000
         model_path = f"{models_dir}/{algorithm}/{TIMESTEPS*node._epoch}.zip"
-        model = TD3.load(model_path, env=env)
+        model = PPO.load(model_path, env=env)
         node.get_logger().info(f"Model {TIMESTEPS*(node._epoch)} has been loaded")
 
         try:

@@ -220,6 +220,19 @@ def check_turtle_collision(obstacle_list, pending_list):
             return True
     return False
 ########## TURTLE_FUNCTIONS_END ##########
+
+def create_empty_map(
+    map_length = 6,
+    map_width = 6,
+    divison = 100,
+    goal_x = 2.0,
+    goal_y = 2.0
+):
+    i_max = int(map_width*divison + 1)
+    j_max = int(map_length*divison + 1)
+    obstacle_list = np.zeros(shape=(i_max, j_max), dtype=np.uint8)
+    turtle_goal = [goal_x, goal_y]
+    return obstacle_list, turtle_goal
         
 def create_map(
         map_length = 6,

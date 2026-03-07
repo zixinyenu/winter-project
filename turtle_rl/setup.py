@@ -55,7 +55,6 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'moveTest = turtle_rl.moveTest:main',
             'simplified_environment = turtle_rl.simplified_env:main',
             'gazebo_controller = turtle_rl.gazebo_controller:main',
             'training_node = turtle_rl.training_node:main',
