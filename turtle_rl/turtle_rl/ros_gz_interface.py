@@ -71,10 +71,23 @@ class ros_gz_interface:
 
     # Genius design
     def reset_goal_position(self):
-        has_collision = True
-        while has_collision:
-            x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
-            has_collision = check_turtle_collision(self._obstacle_list, pending_list)
+        # has_collision = True
+        # while has_collision:
+        #     x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
+        #     has_collision = check_turtle_collision(self._obstacle_list, pending_list)
+        rand = np.random.random_integers(low=1, high=4)
+        if rand == 1:
+            x = 2.0
+            y = 0.0
+        elif rand == 2:
+            x = 0.0
+            y = 2.0
+        elif rand == 3:
+            x = -2.0
+            y = 0.0
+        else:
+            x = 0.0
+            y = -2.0
         self._goal_pos[0] = x
         self._goal_pos[1] = y
         self._distance, self._bearing = self._get_distance_and_bearing()

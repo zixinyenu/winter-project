@@ -70,7 +70,7 @@ def main(args=None):
                 env=env,
                 verbose=1,
                 tensorboard_log=logs_dir,
-                learning_rate=0.00005
+                learning_rate=0.0001
             )
 
             TIMESTEPS = 100000

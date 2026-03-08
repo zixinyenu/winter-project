@@ -37,10 +37,7 @@ class simplified_env(gym.Env, Node):
         #     high=np.array([self._max_translational_velocity, self._max_rotational_vel]),
         #     dtype=np.float32
         # )
-        self.action_space = spaces.MultiDiscrete(
-            nvec=np.array([2, 5]),
-            dtype=np.uint8
-        )
+        self.action_space = spaces.Discrete(4, dtype=np.uint8)
         # Observation space: 
         obs_low = np.append(
             np.array([np.float32(0.06)]*18),
@@ -77,11 +74,18 @@ class simplified_env(gym.Env, Node):
         # Publish an aciton, action = [linear_x, angular_z]
         # linear_x = action[0]
         # angular_z = action[1]
-        if action[0] == 0:
+        if action == np.uint8(0):
             linear_x = 0.22
-        else:
+            angular_z = 0.0
+        elif action == np.uint(1):
             linear_x = -0.11
-        angular_z = -2.84 + action[1] * 1.42
+            angular_z = 0.0
+        elif action == np.uint(2):
+            linear_x = 0.11
+            angular_z = 1.42
+        else:
+            linear_x = 0.11
+            angular_z = -1.42
         self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
 
         # Spin once
@@ -107,8 +111,10 @@ class simplified_env(gym.Env, Node):
 
         # Check if the episode needs to be truncated
         flag_2 = False
-        if self._timestep_count == 20000 and self._success_count >= 1:
+        if self._timestep_count == 25000:
             flag_2 = True
+        # if self.location_observation[0] > 3.0 and self._timestep_count > 1000:
+        #     flag_2 = True
         self.truncated = flag_2
         truncated = self.truncated
 
@@ -169,7 +175,7 @@ class simplified_env(gym.Env, Node):
         rclpy.spin_once(self)
 
     def get_observation(self):
-        self.laser_observation = self.ros_gz_interface.get_laser_readings()
+        self.laser_observation = np.array([np.float32(9)]*18)
         self.location_observation = self.ros_gz_interface.get_distance_and_bearing()
         self.observation = np.append(self.laser_observation, self.location_observation)
         return self.observation
