@@ -14,8 +14,18 @@ class simplified_env(gym.Env, Node):
         super().__init__('simplified_env')
         self.get_logger().info("The simplified_env node has just been created.")
         self.ros_gz_interface = ros_gz_interface(self)
-        # TODO Make it a ROS parameter
-        self._tolerence = 0.10
+
+        # Callback Group
+        self.cbgroup = MutuallyExclusiveCallbackGroup()
+
+        # Clients
+        self.set_entity_pose_cli = self.create_client(
+            SetEntityPose, '/world/empty/set_pose', callback_group=self.cbgroup
+        )
+        while not self.set_entity_pose_cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('/world/empty/set_pose service unavailable')
+
+        self._tolerence = 0.15
         self._max_translational_velocity = np.float32(0.22)
         self._max_rotational_vel = np.float32(2.84)
         self._min_detection_distance = np.float32(0.16)
@@ -51,9 +61,9 @@ class simplified_env(gym.Env, Node):
         self.truncated = False
         self.reward = 0
 
-        self._step_count = 0
+        self._timestep_count = 0
         self._episode_count = 0
-        self._reward_border = 2*np.sqrt(2)
+        self._reward_border = 1.0
         self._success_count = 0
 
         self.laser_observation = np.array([np.float32(9)]*18)
@@ -62,7 +72,7 @@ class simplified_env(gym.Env, Node):
 
     def step(self, action):
         # Increment step count
-        self._step_count += 1
+        self._timestep_count += 1
 
         # Publish an aciton, action = [linear_x, angular_z]
         # linear_x = action[0]
@@ -97,13 +107,13 @@ class simplified_env(gym.Env, Node):
 
         # Check if the episode needs to be truncated
         flag_2 = False
-        if self._step_count % 20000 == 0 and self._success_count >= 10:
+        if self._timestep_count == 20000 and self._success_count >= 1:
             flag_2 = True
         self.truncated = flag_2
         truncated = self.truncated
 
         # # Debug
-        # if self._step_count % 1000 == 0:
+        # if self._timestep_count % 1000 == 0:
         #     self.get_logger().info(f"{self.ros_gz_interface._bearing}")
 
         return observation, reward, terminated, truncated, info
@@ -114,17 +124,30 @@ class simplified_env(gym.Env, Node):
         # Reset RL variables
         self.done = False
         self.truncated = False
+        self._timestep_count = 0
 
         self.laser_observation = np.array([np.float32(9)]*18)
         self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
-        # # Reset the goal position
-        # # Skip for the first reset in each map configuration
-        if self._step_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
+        set_pose_request = SetEntityPose.Request()
+        set_pose_request.entity.name = "turtlebot3_burger"
+        set_pose_request.pose.position.x = 0.0
+        set_pose_request.pose.position.y = 0.0
+        set_pose_request.pose.position.z = 0.0
+        set_pose_request.pose.orientation.z = 0.0
+        success = False
+        while not success:
+            result = self.set_entity_pose_cli.call_async(set_pose_request)
+            success = True
+        self.get_logger().info("Turtlebot spawned at (0.0, 0.0), with an orientation of 0.0")
+
+        # Reset the goal position
+        # Skip for the first reset in each map configuration
+        if self._episode_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
             new_goal_pos = self.ros_gz_interface.reset_goal_position()
             self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
-            self._episode_count += 1
+        self._episode_count += 1
 
         # Spin once to get initial observation and info
         self.spin()

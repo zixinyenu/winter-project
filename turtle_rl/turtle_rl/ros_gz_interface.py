@@ -77,13 +77,14 @@ class ros_gz_interface:
             has_collision = check_turtle_collision(self._obstacle_list, pending_list)
         self._goal_pos[0] = x
         self._goal_pos[1] = y
+        self._distance, self._bearing = self._get_distance_and_bearing()
         return self._goal_pos
 
     def obstacle_list_is_initialized(self):
         obstacle_list = self._obstacle_list
-        # When the map has not been initialized, obstacle_list has a size of 1
+        # When the map has not been initialized, obstacle_list has a size of 0
         # Empty list is not used since it causes error elsewhere
-        if len(obstacle_list) == 1:
+        if len(obstacle_list) == 0:
             return False
         else:
             return True
