@@ -25,8 +25,10 @@ def normalize_angle(rad):
     if abs(rad) >= 2*np.pi:
         two_pi = int(rad / (2 * np.pi))
         rad -= two_pi * 2 * np.pi
-    if rad >= np.pi:
-        rad -= 2*np.pi
+    if rad > np.pi:
+        rad += -2*np.pi
+    elif rad < -np.pi:
+        rad += 2*np.pi
     return rad
 
 def rot2d(body_x, body_y, rot_x, rot_y, rad):

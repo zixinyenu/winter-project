@@ -9,6 +9,8 @@ from tf2_msgs.msg import TFMessage
 
 from tf_transformations import euler_from_quaternion
 
+from .map_env import *
+
 class turtle_env:
     """turtle_env class."""
 
@@ -116,10 +118,10 @@ class turtle_env:
                     np.float32(tf.transform.translation.y)
                 ])
                 angles = euler_from_quaternion([
-                    tf.transform.rotation.w,
                     tf.transform.rotation.x,
                     tf.transform.rotation.y,
-                    tf.transform.rotation.z
+                    tf.transform.rotation.z,
+                    tf.transform.rotation.w,
                 ])
                 self._turtle_ori = angles[2]
         # self.node.get_logger().info(f'turtle pos: {self._turtle_pos[0]}, {self._turtle_pos[1]}')

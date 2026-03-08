@@ -49,6 +49,7 @@ class ros_gz_interface:
         self.turtle_environment.cmd_vel_publish(action)
 
     def get_distance_and_bearing(self):
+        self._distance, self._bearing = self._get_distance_and_bearing()
         return np.array([self._distance, self._bearing])
 
     def get_laser_readings(self):
@@ -128,11 +129,13 @@ class ros_gz_interface:
     def _get_distance_and_bearing(self):
         turtle_x = self.turtle_environment._turtle_pos[0]
         turtle_y = self.turtle_environment._turtle_pos[1]
+        turtle_theta = self.turtle_environment._turtle_ori
         goal_x = self._goal_pos[0]
         goal_y = self._goal_pos[1]
         distance = ((goal_x - turtle_x)**2 + (goal_y - turtle_y)**2)**0.5
-        bearing = np.arctan2(turtle_x - goal_x, turtle_y - goal_y)
-        return np.float32(distance), np.float32(bearing)
+        bearing = np.arctan2(goal_y - turtle_y, goal_x - turtle_x)
+        relative_bearing = normalize_angle(bearing - turtle_theta)
+        return np.float32(distance), np.float32(relative_bearing)
 
     def _out_of_bound_grid_check(self, map_length=6, map_width=6, collision_raidus=0.11):
         turtle_x = self.turtle_environment._turtle_pos[0]

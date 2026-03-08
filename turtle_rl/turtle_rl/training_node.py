@@ -70,23 +70,25 @@ def main(args=None):
                 env=env,
                 verbose=1,
                 tensorboard_log=logs_dir,
-                learning_rate=0.0003
+                learning_rate=0.0003,
+                n_steps=1024
             )
 
-            TIMESTEPS = 10000
-            for i in range(1, 1001):
+            TIMESTEPS = 1000
+            for i in range(1, 10001):
                 model.learn(
                     total_timesteps=TIMESTEPS,
                     reset_num_timesteps=False,
                     tb_log_name=algorithm
                 )
                 node.get_logger().info(f"Model {TIMESTEPS*i} has been trained")
-                model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
-                node.get_logger().info(f"Model {TIMESTEPS*i} has been saved")
+                if i % 10 == 0:
+                    model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
+                    node.get_logger().info(f"Model {TIMESTEPS*i} has been saved")
         except KeyboardInterrupt:
             model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
     elif node._training_mode == 'retrain':
-        TIMESTEPS = 10000
+        TIMESTEPS = 1000
         model_path = f"{models_dir}/{algorithm}/{TIMESTEPS*node._epoch}.zip"
         model = PPO.load(model_path, env=env)
         node.get_logger().info(f"Model {TIMESTEPS*(node._epoch)} has been loaded")

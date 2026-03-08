@@ -79,6 +79,7 @@ class simplified_env(gym.Env, Node):
         # linear_x = action[0]
         # angular_z = action[1]
         # self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
+
         if action == np.uint8(0):
             self.ros_gz_interface.publish_twist([0.20, 0.0])
         elif action == np.uint(1):
@@ -124,8 +125,9 @@ class simplified_env(gym.Env, Node):
         truncated = self.truncated
 
         # # Debug
-        # if self._timestep_count % 1000 == 0:
-        #     self.get_logger().info(f"{self.ros_gz_interface._bearing}")
+        # if self._timestep_count % 1 == 0:
+        #     self.get_logger().info(f"Relative bearing: {self.ros_gz_interface._bearing}")
+        #     self.get_logger().info(f"Turtlebot orientation: {self.ros_gz_interface.turtle_environment._turtle_ori}")
 
         return observation, reward, terminated, truncated, info
 
