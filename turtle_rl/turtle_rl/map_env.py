@@ -220,7 +220,7 @@ def create_empty_map(
     map_length = 6,
     map_width = 6,
     divison = 100,
-    goal_x = 2.0,
+    goal_x = 1.0,
     goal_y = 0.0
 ):
     i_max = int(map_width*divison + 1)

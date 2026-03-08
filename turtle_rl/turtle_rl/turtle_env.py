@@ -61,7 +61,7 @@ class turtle_env:
         )
 
         # Class variables
-        self._laser_readings = np.array([np.float32(9)]*18) # LSD-02 can ony detect up to 8m, so 9m for inf
+        self._laser_readings = np.array([np.float32(9)]*36) # LSD-02 can ony detect up to 8m, so 9m for inf
         self._turtle_pos = np.array([np.float32(0), np.float32(0)])
         self._turtle_ori = np.float32(0)
         self._prev_fence_contact_count = 0

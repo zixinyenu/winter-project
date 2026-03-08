@@ -1,3 +1,4 @@
+import time
 import rclpy
 import gymnasium as gym
 import numpy as np
@@ -40,11 +41,11 @@ class simplified_env(gym.Env, Node):
         self.action_space = spaces.Discrete(4, dtype=np.uint8)
         # Observation space: 
         obs_low = np.append(
-            np.array([np.float32(0.06)]*18),
+            np.array([np.float32(0.06)]*36),
             np.array([np.float32(0), np.float32(-np.pi)])
         )
         obs_high = np.append(
-            np.array([np.float32(9)]*18),
+            np.array([np.float32(9)]*36),
             np.array([np.float32(8.4853), np.float32(np.pi)])
         ) # (6**2 + 6**2)**0.5 = 8.4853
         self.observation_space = spaces.Box(
@@ -61,9 +62,12 @@ class simplified_env(gym.Env, Node):
         self._timestep_count = 0
         self._episode_count = 0
         self._reward_border = 1.0
+        self._reward_count_1 = 0
+        self._reward_count_2 = 0
+        self._reward_count_3 = 0
         self._success_count = 0
 
-        self.laser_observation = np.array([np.float32(9)]*18)
+        self.laser_observation = np.array([np.float32(9)]*36)
         self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
@@ -74,21 +78,24 @@ class simplified_env(gym.Env, Node):
         # Publish an aciton, action = [linear_x, angular_z]
         # linear_x = action[0]
         # angular_z = action[1]
+        # self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
         if action == np.uint8(0):
-            linear_x = 0.22
-            angular_z = 0.0
+            self.ros_gz_interface.publish_twist([0.20, 0.0])
         elif action == np.uint(1):
-            linear_x = -0.11
-            angular_z = 0.0
+            self.ros_gz_interface.publish_twist([-0.10, 0.0])
         elif action == np.uint(2):
-            linear_x = 0.11
-            angular_z = 1.42
+            self.ros_gz_interface.publish_twist([0.0, 1.57])
+            time.sleep(1.0)
+            self.spin()
+            self.ros_gz_interface.publish_twist([0.20, 0.0])
         else:
-            linear_x = 0.11
-            angular_z = -1.42
-        self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
+            self.ros_gz_interface.publish_twist([0.0, -1.57])
+            time.sleep(1.0)
+            self.spin()
+            self.ros_gz_interface.publish_twist([0.20, 0.0])
 
         # Spin once
+        time.sleep(0.5)
         self.spin()
 
         # Get observation and info
@@ -111,10 +118,8 @@ class simplified_env(gym.Env, Node):
 
         # Check if the episode needs to be truncated
         flag_2 = False
-        if self._timestep_count == 25000:
+        if self._timestep_count == 50:
             flag_2 = True
-        # if self.location_observation[0] > 3.0 and self._timestep_count > 1000:
-        #     flag_2 = True
         self.truncated = flag_2
         truncated = self.truncated
 
@@ -131,8 +136,11 @@ class simplified_env(gym.Env, Node):
         self.done = False
         self.truncated = False
         self._timestep_count = 0
+        self._reward_count_1 = 0
+        self._reward_count_2 = 0
+        self._reward_count_3 = 0
 
-        self.laser_observation = np.array([np.float32(9)]*18)
+        self.laser_observation = np.array([np.float32(9)]*36)
         self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
@@ -175,7 +183,7 @@ class simplified_env(gym.Env, Node):
         rclpy.spin_once(self)
 
     def get_observation(self):
-        self.laser_observation = np.array([np.float32(9)]*18)
+        self.laser_observation = np.array([np.float32(9)]*36)
         self.location_observation = self.ros_gz_interface.get_distance_and_bearing()
         self.observation = np.append(self.laser_observation, self.location_observation)
         return self.observation
@@ -192,8 +200,9 @@ class simplified_env(gym.Env, Node):
         # After initialization, self.location_observation[0] will be very close to 0 briefly
         if self.location_observation[0] < self._tolerence \
             and self.location_observation[0] > 0.01:
-            self.reward += 100
+            # self.reward += 30
             self.get_logger().info(f"The turtlebot is within {self._tolerence} from the goal!")
+
         if self.location_observation[0] > 0.01:
             self.reward += 0.01*(1.0 - self.location_observation[0]/self._reward_border)
 
