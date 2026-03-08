@@ -16,6 +16,10 @@ class simplified_env(gym.Env, Node):
         self.get_logger().info("The simplified_env node has just been created.")
         self.ros_gz_interface = ros_gz_interface(self)
 
+        # Gazebo factor
+        self.declare_parameter("real_time_factor", 5.0)
+        self._real_time_factor = self.get_parameter("real_time_factor").value
+
         # Callback Group
         self.cbgroup = MutuallyExclusiveCallbackGroup()
 
@@ -85,18 +89,18 @@ class simplified_env(gym.Env, Node):
         elif action == np.uint(1):
             self.ros_gz_interface.publish_twist([-0.10, 0.0])
         elif action == np.uint(2):
-            self.ros_gz_interface.publish_twist([0.0, 1.57])
-            time.sleep(1.0)
+            self.ros_gz_interface.publish_twist([0.0, np.pi/2.0])
+            time.sleep(1.0/self._real_time_factor)
             self.spin()
             self.ros_gz_interface.publish_twist([0.20, 0.0])
         else:
-            self.ros_gz_interface.publish_twist([0.0, -1.57])
-            time.sleep(1.0)
+            self.ros_gz_interface.publish_twist([0.0, -np.pi/2.0])
+            time.sleep(1.0/self._real_time_factor)
             self.spin()
             self.ros_gz_interface.publish_twist([0.20, 0.0])
 
         # Spin once
-        time.sleep(0.5)
+        time.sleep(0.5/self._real_time_factor)
         self.spin()
 
         # Get observation and info
