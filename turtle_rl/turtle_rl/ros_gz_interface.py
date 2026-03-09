@@ -76,8 +76,8 @@ class ros_gz_interface:
         # while has_collision:
         #     x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
         #     has_collision = check_turtle_collision(self._obstacle_list, pending_list)
-        x = np.random.uniform(low=-2.0, high=2.0)
-        max_y_abs = np.sqrt(4.0 - pow(x, 2))
+        x = np.random.uniform(low=-1.5, high=1.5)
+        max_y_abs = np.sqrt(2.25 - pow(x, 2))
         y = np.random.uniform(low=-max_y_abs, high=max_y_abs)
         self._goal_pos[0] = x
         self._goal_pos[1] = y

@@ -17,7 +17,7 @@ class simplified_env(gym.Env, Node):
         self.ros_gz_interface = ros_gz_interface(self)
 
         # Gazebo factor
-        self.declare_parameter("real_time_factor", 5.0)
+        self.declare_parameter("real_time_factor", 10.0)
         self._real_time_factor = self.get_parameter("real_time_factor").value
 
         # Callback Group
@@ -30,7 +30,7 @@ class simplified_env(gym.Env, Node):
         while not self.set_entity_pose_cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('/world/empty/set_pose service unavailable')
 
-        self._tolerence = 0.15
+        self._tolerence = 0.25
         self._max_translational_velocity = np.float32(0.22)
         self._max_rotational_vel = np.float32(2.84)
         self._min_detection_distance = np.float32(0.16)
@@ -65,7 +65,7 @@ class simplified_env(gym.Env, Node):
 
         self._timestep_count = 0
         self._episode_count = 0
-        self._reward_border = 1.0
+        self._reward_border = 0.75
         self._reward_count_1 = 0
         self._reward_count_2 = 0
         self._reward_count_3 = 0
@@ -131,7 +131,7 @@ class simplified_env(gym.Env, Node):
         # # Debug
         # if self._timestep_count % 1 == 0:
         #     self.get_logger().info(f"Relative bearing: {self.ros_gz_interface._bearing}")
-        #     self.get_logger().info(f"Turtlebot orientation: {self.ros_gz_interface.turtle_environment._turtle_ori}")
+        #     self.get_logger().info(f"Range: {observation[36]}")
 
         return observation, reward, terminated, truncated, info
 
@@ -164,9 +164,9 @@ class simplified_env(gym.Env, Node):
 
         # Reset the goal position
         # Skip for the first reset in each map configuration
-        if self._episode_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
-            new_goal_pos = self.ros_gz_interface.reset_goal_position()
-            self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
+        # if self._episode_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
+        #     new_goal_pos = self.ros_gz_interface.reset_goal_position()
+        #     self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
         self._episode_count += 1
 
         # Spin once to get initial observation and info
@@ -206,11 +206,11 @@ class simplified_env(gym.Env, Node):
         # After initialization, self.location_observation[0] will be very close to 0 briefly
         if self.location_observation[0] < self._tolerence \
             and self.location_observation[0] > 0.01:
-            # self.reward += 30
+            self.reward += 100
             self.get_logger().info(f"The turtlebot is within {self._tolerence} from the goal!")
 
         if self.location_observation[0] > 0.01:
-            self.reward += 0.01*(1.0 - self.location_observation[0]/self._reward_border)
+            self.reward += 10.0*(1.0 - self.location_observation[0]/self._reward_border)
 
         # if self.ros_gz_interface.out_of_bound_penalty_grid():
         #     self.reward += -0.01
