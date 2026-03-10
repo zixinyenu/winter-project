@@ -86,19 +86,20 @@ def main(args=None):
             #         model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
             #         node.get_logger().info(f"Model {TIMESTEPS*i} has been saved")
 
-            TIMESTEPS = 200000
-            model.learn(
-                total_timesteps=TIMESTEPS,
-                reset_num_timesteps=False,
-                tb_log_name=algorithm
-            )
-            node.get_logger().info(f"Model {TIMESTEPS} has been trained")
-            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS}")
-            node.get_logger().info(f"Model {TIMESTEPS} has been saved")
+            TIMESTEPS = 5000
+            for i in range(1, 101):
+                model.learn(
+                    total_timesteps=TIMESTEPS,
+                    reset_num_timesteps=False,
+                    tb_log_name=algorithm
+                )
+                node.get_logger().info(f"Model {TIMESTEPS*i} has been trained")
+                model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
+                node.get_logger().info(f"Model {TIMESTEPS*i} has been saved")
         except KeyboardInterrupt:
-            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS}")
+            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
     elif node._training_mode == 'retrain':
-        TIMESTEPS = 50000
+        TIMESTEPS = 5000
         model_path = f"{models_dir}/{algorithm}/{TIMESTEPS*node._epoch}.zip"
         model = PPO.load(model_path, env=env)
         node.get_logger().info(f"Model {TIMESTEPS*(node._epoch)} has been loaded")

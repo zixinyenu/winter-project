@@ -65,7 +65,7 @@ class simplified_env(gym.Env, Node):
 
         self._timestep_count = 0
         self._episode_count = 0
-        self._reward_border = 0.75
+        self._reward_border = 1.50
         self._reward_count_1 = 0
         self._reward_count_2 = 0
         self._reward_count_3 = 0
@@ -126,7 +126,7 @@ class simplified_env(gym.Env, Node):
 
         # Check if the episode needs to be truncated
         flag_2 = False
-        if self._timestep_count == 50:
+        if self._timestep_count == 100:
             flag_2 = True
         self.truncated = flag_2
         truncated = self.truncated
@@ -168,7 +168,7 @@ class simplified_env(gym.Env, Node):
         # Reset the goal position
         # Skip for the first reset in each map configuration
         if self._episode_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
-            new_goal_pos = self.ros_gz_interface.reset_goal_position_p12()
+            new_goal_pos = self.ros_gz_interface.reset_goal_position_p13()
             self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
         self._episode_count += 1
 
