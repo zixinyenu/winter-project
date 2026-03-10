@@ -83,14 +83,15 @@ class ros_gz_interface:
         self._goal_pos[1] = y
         self._distance, self._bearing = self._get_distance_and_bearing()
         return self._goal_pos
+
     def reset_goal_position_p12(self):
-        # mag = 1.5*np.cos(np.pi/4.0)
-        rand = np.random.random_integers(low=1, high=4)
-        if rand <= 3:
-            x = np.random.choice([1.5, 0.0, -1.5], replace=True)
+        mag = 1.5*np.cos(np.pi/4.0)
+        rand = np.random.random_integers(low=1, high=8)
+        if rand <= 5:
+            x = np.random.choice([1.5, mag, 0.0, -mag, -1.5], replace=True)
             y = np.sqrt(pow(1.5, 2) - pow(x, 2))
         else:
-            x = np.random.choice([0.0], replace=True)
+            x = np.random.choice([-mag, 0.0, mag], replace=True)
             y = -np.sqrt(pow(1.5, 2) - pow(x, 2))
         self._goal_pos[0] = x
         self._goal_pos[1] = y
