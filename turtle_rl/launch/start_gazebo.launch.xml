@@ -10,7 +10,7 @@
     </include>
 
     <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
-        <arg name="gz_args" value="-r $(var world) --gui-config $(var gz_gui_config)"/>
+        <arg name="gz_args" value="-r -s $(var world) --gui-config $(var gz_gui_config)"/>
     </include>
 
     <node pkg="ros_gz_sim" exec="create" name="create_turtle" output="screen">

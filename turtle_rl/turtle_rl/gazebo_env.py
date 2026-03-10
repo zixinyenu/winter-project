@@ -74,7 +74,7 @@ class gazebo_env:
 
         # Non-ROS variables
         self._simulation_paused = False
-        self._worlds_path = "/home/zixin/ws/winter_project/src/turtle_rl/worlds"
+        self._worlds_path = "/home/ubuntu/ws/src/turtle_rl/worlds"
         self._square_count = 0
         self._rectangle_count = 0
         self._cylinder_count = 0

@@ -32,8 +32,8 @@ def main(args=None):
 
     # Create directories where the trained RL models and logswill be saved
     algorithm = "PPO"
-    models_dir = f"/home/zixin/ws/winter_project/src/turtle_rl/models"
-    logs_dir = f"/home/zixin/ws/winter_project/src/turtle_rl/logs"
+    models_dir = f"/home/ubuntu/ws/src/turtle_rl/models"
+    logs_dir = f"/home/ubuntu/ws/src/turtle_rl/logs"
 
     # Create directories for models and logs if they have not been created
     if not os.path.exists(models_dir):
