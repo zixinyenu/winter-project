@@ -86,21 +86,24 @@ class simplified_env(gym.Env, Node):
 
         if action == np.uint8(0):
             self.ros_gz_interface.publish_twist([0.20, 0.0])
+            time.sleep(0.50/self._real_time_factor)
         elif action == np.uint(1):
             self.ros_gz_interface.publish_twist([-0.10, 0.0])
+            time.sleep(0.50/self._real_time_factor)
         elif action == np.uint(2):
             self.ros_gz_interface.publish_twist([0.0, np.pi/2.0])
             time.sleep(1.0/self._real_time_factor)
             self.spin()
-            self.ros_gz_interface.publish_twist([0.20, 0.0])
+            self.ros_gz_interface.publish_twist([0.18, 0.0])
+            time.sleep(1.00/self._real_time_factor)
         else:
             self.ros_gz_interface.publish_twist([0.0, -np.pi/2.0])
             time.sleep(1.0/self._real_time_factor)
             self.spin()
-            self.ros_gz_interface.publish_twist([0.20, 0.0])
+            self.ros_gz_interface.publish_twist([0.18, 0.0])
+            time.sleep(1.00/self._real_time_factor)
 
         # Spin once
-        time.sleep(0.5/self._real_time_factor)
         self.spin()
 
         # Get observation and info
@@ -164,9 +167,9 @@ class simplified_env(gym.Env, Node):
 
         # Reset the goal position
         # Skip for the first reset in each map configuration
-        # if self._episode_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
-        #     new_goal_pos = self.ros_gz_interface.reset_goal_position()
-        #     self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
+        if self._episode_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
+            new_goal_pos = self.ros_gz_interface.reset_goal_position_p12()
+            self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
         self._episode_count += 1
 
         # Spin once to get initial observation and info

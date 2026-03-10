@@ -71,7 +71,7 @@ def main(args=None):
                 verbose=1,
                 tensorboard_log=logs_dir,
                 learning_rate=0.0003,
-                n_steps=1024
+                n_steps=2048
             )
 
             # TIMESTEPS = 1000
@@ -86,7 +86,7 @@ def main(args=None):
             #         model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
             #         node.get_logger().info(f"Model {TIMESTEPS*i} has been saved")
 
-            TIMESTEPS = 50000
+            TIMESTEPS = 250000
             model.learn(
                 total_timesteps=TIMESTEPS,
                 reset_num_timesteps=False,

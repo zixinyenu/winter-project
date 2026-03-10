@@ -31,9 +31,6 @@ class gazebo_controller(Node):
             self.timer_callback
         )
 
-        # Non-ROS variables
-        self._goal_pos_buffer = [-4.0, -4.0]
-
     def timer_callback(self):
         msg_ol = UInt8MultiArray()
         msg_ol.data = self.gazebo_controller._obstacle_list
