@@ -98,6 +98,16 @@ class ros_gz_interface:
         self._distance, self._bearing = self._get_distance_and_bearing()
         return self._goal_pos
 
+    def reset_goal_position_p13(self):
+        x_mag = np.random.uniform(low=1.1, high=2.9)
+        x_sign = np.random.choice(a=[1.0, -1.0], replace=True)
+        y_mag = np.random.uniform(low=1.1, high=2.9)
+        y_sign = np.random.choice(a=[1.0, -1.0], replace=True)
+        self._goal_pos[0] = x_mag*x_sign
+        self._goal_pos[1] = y_mag*y_sign
+        self._distance, self._bearing = self._get_distance_and_bearing()
+        return self._goal_pos
+
     def obstacle_list_is_initialized(self):
         obstacle_list = self._obstacle_list
         # When the map has not been initialized, obstacle_list has a size of 0
