@@ -86,7 +86,7 @@ def main(args=None):
             #         model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
             #         node.get_logger().info(f"Model {TIMESTEPS*i} has been saved")
 
-            TIMESTEPS = 500000
+            TIMESTEPS = 250000
             model.learn(
                 total_timesteps=TIMESTEPS,
                 reset_num_timesteps=False,
