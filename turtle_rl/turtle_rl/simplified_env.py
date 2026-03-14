@@ -103,7 +103,7 @@ class simplified_env(gym.Env, Node):
         # Check if the turtlebot reaches the goal with a tolerence
         # After initialization, self.location_observation[0] will be very close to 0 briefly
         flag_1 = False
-        if (self.location_observation[0] < self._tolerence) and self.location_observation[0] > 0.01:
+        if self.location_observation[0] < self._tolerence and self.location_observation[0] > 0.01:
             flag_1 = True
             self._success_count += 1
             self.get_logger().info(f"{self.location_observation[0]} \n")
@@ -144,6 +144,10 @@ class simplified_env(gym.Env, Node):
         while not success:
             result = self.set_entity_pose_cli.call_async(set_pose_request)
             success = True
+        # This might seem to be unnecessary
+        # But there is a delay in the network of the training system
+        # The following line must be added
+        self.ros_gz_interface.turtle_environment._turtle_pos = np.array([np.float32(0), np.float32(0)])
         self.get_logger().info("Turtlebot spawned at (0.0, 0.0), with an orientation of 0.0")
 
         # Reset the goal position
@@ -173,7 +177,7 @@ class simplified_env(gym.Env, Node):
         rclpy.spin_once(self)
 
     def get_observation(self):
-        self.laser_observation = np.array([np.float32(9)]*36)
+        self.laser_observation = self.ros_gz_interface.get_laser_readings()
         self.location_observation = self.ros_gz_interface.get_distance_and_bearing()
         self.observation = np.append(self.laser_observation, self.location_observation)
         return self.observation
