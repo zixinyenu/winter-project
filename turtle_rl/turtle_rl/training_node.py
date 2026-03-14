@@ -57,14 +57,6 @@ def main(args=None):
     # Training!
     if node._training_mode == 'train':
         try:
-            # model = TD3(
-            #     policy="MlpPolicy",
-            #     env=env,
-            #     verbose=1,
-            #     tensorboard_log=logs_dir,
-            #     learning_rate=0.001
-            # )
-
             model = PPO(
                 policy="MlpPolicy",
                 env=env,
@@ -73,18 +65,6 @@ def main(args=None):
                 learning_rate=0.0003,
                 n_steps=2048
             )
-
-            # TIMESTEPS = 1000
-            # for i in range(1, 10001):
-            #     model.learn(
-            #         total_timesteps=TIMESTEPS,
-            #         reset_num_timesteps=False,
-            #         tb_log_name=algorithm
-            #     )
-            #     node.get_logger().info(f"Model {TIMESTEPS*i} has been trained")
-            #     if i % 10 == 0:
-            #         model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
-            #         node.get_logger().info(f"Model {TIMESTEPS*i} has been saved")
 
             TIMESTEPS = 10000
             for i in range(1, 11):
