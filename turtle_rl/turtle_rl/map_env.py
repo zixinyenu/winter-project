@@ -230,6 +230,24 @@ def create_empty_map(
     obstacle_list = np.zeros(shape=(i_max, j_max), dtype=np.uint8)
     turtle_goal = [goal_x, goal_y]
     return obstacle_list, turtle_goal
+
+def create_one_obstacle_map(
+    map_length = 6,
+    map_width = 6,
+    divison = 100,
+    goal_x = 1.5,
+    goal_y = 0.0
+):
+    i_max = int(map_width*divison + 1)
+    j_max = int(map_length*divison + 1)
+    obstacle_list = np.zeros(shape=(i_max, j_max), dtype=np.uint8)
+    for i in range(int((j_max-1)/2 - 0.50*divison + 1),
+                    int((j_max-1)/2 + 0.50*divison + 1)):
+        for j in range(int((i_max-1)/2 + 0.75*divison + 1),
+                    int((i_max-1)/2 + 1.00*divison + 1)):
+            obstacle_list[i][j] = np.uint8(1)
+    turtle_goal = [goal_x, goal_y]
+    return obstacle_list, turtle_goal
         
 def create_map(
         map_length = 6,

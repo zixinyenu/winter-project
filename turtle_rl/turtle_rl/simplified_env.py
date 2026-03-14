@@ -36,12 +36,6 @@ class simplified_env(gym.Env, Node):
         self._min_detection_distance = np.float32(0.16)
         self._max_detection_distance = np.float32(8.0) # Not used
 
-        # Action space: 
-        # self.action_space = spaces.Box(
-        #     low=np.array([-self._max_translational_velocity, -self._max_rotational_vel]),
-        #     high=np.array([self._max_translational_velocity, self._max_rotational_vel]),
-        #     dtype=np.float32
-        # )
         self.action_space = spaces.Discrete(4, dtype=np.uint8)
         # Observation space: 
         obs_low = np.append(
@@ -78,11 +72,6 @@ class simplified_env(gym.Env, Node):
     def step(self, action):
         # Increment step count
         self._timestep_count += 1
-
-        # Publish an aciton, action = [linear_x, angular_z]
-        # linear_x = action[0]
-        # angular_z = action[1]
-        # self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
 
         if action == np.uint8(0):
             self.ros_gz_interface.publish_twist([0.20, 0.0])
@@ -123,15 +112,10 @@ class simplified_env(gym.Env, Node):
 
         # Check if the episode needs to be truncated
         flag_2 = False
-        if self._timestep_count == 50:
+        if self._timestep_count == 100:
             flag_2 = True
         self.truncated = flag_2
         truncated = self.truncated
-
-        # # Debug
-        # if self._timestep_count % 1 == 0:
-        #     self.get_logger().info(f"Relative bearing: {self.ros_gz_interface._bearing}")
-        #     self.get_logger().info(f"Range: {observation[36]}")
 
         return observation, reward, terminated, truncated, info
 
@@ -215,9 +199,9 @@ class simplified_env(gym.Env, Node):
         # if self.ros_gz_interface.out_of_bound_penalty_grid():
         #     self.reward += -0.01
         #     # self.get_logger().info("Apply out-of-bound penalty (constant).")
-        # if self.ros_gz_interface.obstacle_hit_penalty_grid():
-        #     self.reward += -0.01
-        #     # self.get_logger().info("Apply obstacle-hit penalty. (constant)")
+        if self.ros_gz_interface.obstacle_hit_penalty_grid():
+            self.reward += -3.0
+            # self.get_logger().info("Apply obstacle-hit penalty. (constant)")
 
         return self.reward
 

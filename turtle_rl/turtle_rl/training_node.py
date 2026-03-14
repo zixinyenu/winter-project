@@ -20,7 +20,7 @@ class training_node(Node):
         self.get_logger().info("The training node has just been created.")
 
         # Parameters
-        self.declare_parameter('training_mode', 'train')
+        self.declare_parameter('training_mode', 'retrain')
         self.declare_parameter('epoch', 0)
         self._training_mode = self.get_parameter('training_mode').value
         self._epoch = self.get_parameter('epoch').value
@@ -79,22 +79,23 @@ def main(args=None):
         except KeyboardInterrupt:
             model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
     elif node._training_mode == 'retrain':
-        TIMESTEPS = 50000
-        model_path = f"{models_dir}/{algorithm}/{TIMESTEPS*node._epoch}.zip"
+        model_path = f"{models_dir}/P21_PPO/base.zip"
         model = PPO.load(model_path, env=env)
-        node.get_logger().info(f"Model {TIMESTEPS*(node._epoch)} has been loaded")
+        node.get_logger().info(f"Base model has been loaded")
 
-        try:
+    try:
+        TIMESTEPS = 10000
+        for i in range(1, 21):
             model.learn(
                 total_timesteps=TIMESTEPS,
                 reset_num_timesteps=False,
                 tb_log_name=algorithm
             )
-            node.get_logger().info(f"Model {TIMESTEPS*(node._epoch+1)} has been trained")
-            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*(node._epoch+1)}")
-            node.get_logger().info(f"Model {TIMESTEPS*(node._epoch+1)} has been saved")
-        except KeyboardInterrupt:
-            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*(node._epoch+1)}")
+            node.get_logger().info(f"Model base_{TIMESTEPS*i} has been trained")
+            model.save(f"{models_dir}/{algorithm}/base_{TIMESTEPS*i}")
+            node.get_logger().info(f"Model base_{TIMESTEPS*i} has been saved")
+    except KeyboardInterrupt:
+        model.save(f"{models_dir}/{algorithm}/base_{TIMESTEPS*i}")
 
     env.close()
 
