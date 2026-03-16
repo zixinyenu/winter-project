@@ -59,7 +59,7 @@ class simplified_env(gym.Env, Node):
 
         self._timestep_count = 0
         self._episode_count = 0
-        self._reward_border = 1.50
+        self._reward_border = 1.25
         self._success_count = 0
 
         self.laser_observation = np.array([np.float32(9)]*36)
@@ -133,19 +133,19 @@ class simplified_env(gym.Env, Node):
 
         if self._episode_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
             new_start_x, new_start_y, new_start_ori = self.ros_gz_interface.reset_start_position_p31()
-            set_pose_request = SetEntityPose.Request()
-            set_pose_request.entity.name = "turtlebot3_burger"
-            set_pose_request.pose.position.x = new_start_x
-            set_pose_request.pose.position.y = new_start_y
-            set_pose_request.pose.position.z = 0.0
+            set_pose_request_1 = SetEntityPose.Request()
+            set_pose_request_1.entity.name = "turtlebot3_burger"
+            set_pose_request_1.pose.position.x = new_start_x
+            set_pose_request_1.pose.position.y = new_start_y
+            set_pose_request_1.pose.position.z = 0.0
             x, y, z, w = quaternion_from_euler(0.0, 0.0, new_start_ori)
-            set_pose_request.pose.orientation.x = x
-            set_pose_request.pose.orientation.y = y
-            set_pose_request.pose.orientation.z = z
-            set_pose_request.pose.orientation.w = w
+            set_pose_request_1.pose.orientation.x = x
+            set_pose_request_1.pose.orientation.y = y
+            set_pose_request_1.pose.orientation.z = z
+            set_pose_request_1.pose.orientation.w = w
             success = False
             while not success:
-                result = self.set_entity_pose_cli.call_async(set_pose_request)
+                result = self.set_entity_pose_cli.call_async(set_pose_request_1)
                 success = True
             # This might seem to be unnecessary
             # But there is a delay in the network of the training system
@@ -156,6 +156,15 @@ class simplified_env(gym.Env, Node):
             # Reset the goal position
             # Skip for the first reset in each map configuration
             new_goal_pos = self.ros_gz_interface.reset_goal_position_p31(new_start_x, new_start_y)
+            set_pose_request_2 = SetEntityPose.Request()
+            set_pose_request_2.entity.name = "goal_visual"
+            set_pose_request_2.pose.position.x = new_goal_pos[0]
+            set_pose_request_2.pose.position.y = new_goal_pos[1]
+            set_pose_request_2.pose.position.z = 0.0
+            success = False
+            while not success:
+                result = self.set_entity_pose_cli.call_async(set_pose_request_2)
+                success = True
             self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
         self._episode_count += 1
 
@@ -204,10 +213,10 @@ class simplified_env(gym.Env, Node):
 
         if self.ros_gz_interface.out_of_bound_penalty_grid():
             self.reward += -15.0
-            self.get_logger().info("Apply out-of-bound penalty (constant).")
+            # self.get_logger().info("Apply out-of-bound penalty (constant).")
         if self.ros_gz_interface.obstacle_hit_penalty_grid():
             self.reward += -15.0
-            self.get_logger().info("Apply obstacle-hit penalty. (constant)")
+            # self.get_logger().info("Apply obstacle-hit penalty. (constant)")
 
         return self.reward
 

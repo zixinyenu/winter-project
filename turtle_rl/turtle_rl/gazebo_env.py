@@ -120,20 +120,27 @@ class gazebo_env:
                 obstacle_list.append(i)
         self._obstacle_list = obstacle_list
         self._goal_pos = goal_pos
-        self.node.get_logger().info(f"Initial goal position set at ({goal_pos[0]}, {goal_pos[1]})")
 
-        set_pose_request = SetEntityPose.Request()
-        set_pose_request.entity.name = "turtlebot3_burger"
-        set_pose_request.pose.position.x = start_pos[0]
-        set_pose_request.pose.position.y = start_pos[1]
-        set_pose_request.pose.position.z = 0.0
+        set_pose_request_1 = SetEntityPose.Request()
+        set_pose_request_1.entity.name = "turtlebot3_burger"
+        set_pose_request_1.pose.position.x = start_pos[0]
+        set_pose_request_1.pose.position.y = start_pos[1]
+        set_pose_request_1.pose.position.z = 0.0
         x, y, z, w = quaternion_from_euler(0.0, 0.0, start_pos[2])
-        set_pose_request.pose.orientation.x = x
-        set_pose_request.pose.orientation.y = y
-        set_pose_request.pose.orientation.z = z
-        set_pose_request.pose.orientation.w = w
-        result = await self.set_entity_pose_cli.call_async(set_pose_request)
+        set_pose_request_1.pose.orientation.x = x
+        set_pose_request_1.pose.orientation.y = y
+        set_pose_request_1.pose.orientation.z = z
+        set_pose_request_1.pose.orientation.w = w
+        result = await self.set_entity_pose_cli.call_async(set_pose_request_1)
         self.node.get_logger().info(f"Initial turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
+
+        set_pose_request_2 = SetEntityPose.Request()
+        set_pose_request_2.entity.name = "goal_visual"
+        set_pose_request_2.pose.position.x = goal_pos[0]
+        set_pose_request_2.pose.position.y = goal_pos[1]
+        set_pose_request_2.pose.position.z = 0.5
+        result = await self.set_entity_pose_cli.call_async(set_pose_request_2)
+        self.node.get_logger().info(f"Initial goal at ({goal_pos[0]}, {goal_pos[1]})\n")
 
         square_count = 0
         for square in square_list:
@@ -150,7 +157,7 @@ class gazebo_env:
             spawn_request.entity_factory.pose.orientation.w = w
             result = await self.spawn_entity_cli.call_async(spawn_request)
             square_count += 1
-        self.node.get_logger().info("Squares all created successfully.")
+        # self.node.get_logger().info("Squares all created successfully.")
         self._square_count = square_count
 
         rectangle_count = 0
@@ -168,7 +175,7 @@ class gazebo_env:
             spawn_request.entity_factory.pose.orientation.w = w
             result = await self.spawn_entity_cli.call_async(spawn_request)
             rectangle_count += 1
-        self.node.get_logger().info("Rectangles all created successfully.")
+        # self.node.get_logger().info("Rectangles all created successfully.")
         self._rectangle_count = rectangle_count
 
         cylinder_count = 0
@@ -181,7 +188,7 @@ class gazebo_env:
             spawn_request.entity_factory.pose.position.z = 0.5
             result = await self.spawn_entity_cli.call_async(spawn_request)
             cylinder_count += 1
-        self.node.get_logger().info("Cylinders all created successfully.")
+        # self.node.get_logger().info("Cylinders all created successfully.")
         self._cylinder_count = cylinder_count
 
         response.success = True
@@ -260,7 +267,7 @@ class gazebo_env:
             delete_request.entity.name = square_name
             delete_request.entity.type = 2
             result = await self.delete_entity_cli.call_async(delete_request)
-        self.node.get_logger().info("Squares all deleted successfully.")
+        # self.node.get_logger().info("Squares all deleted successfully.")
         self._square_count = 0
 
         for rectangle_num in range(self._rectangle_count):
@@ -268,7 +275,7 @@ class gazebo_env:
             delete_request.entity.name = rectangle_name
             delete_request.entity.type = 2
             result = await self.delete_entity_cli.call_async(delete_request)
-        self.node.get_logger().info("Rectangles all deleted successfully.")
+        # self.node.get_logger().info("Rectangles all deleted successfully.")
         self._rectangle_count = 0
 
         for cylinder_num in range(self._cylinder_count):
@@ -276,7 +283,7 @@ class gazebo_env:
             delete_request.entity.name = cylinder_name
             delete_request.entity.type = 2
             result = await self.delete_entity_cli.call_async(delete_request)
-        self.node.get_logger().info("Cylinders all deleted successfully.")
+        # self.node.get_logger().info("Cylinders all deleted successfully.")
         self._cylinder_count = 0
 
         return response

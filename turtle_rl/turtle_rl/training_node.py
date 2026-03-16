@@ -81,6 +81,8 @@ def main(args=None):
     elif node._training_mode == 'retrain':
         TIMESTEPS = 1000
         model_path = f"{models_dir}/P31_PPO/base_{TIMESTEPS*node._epoch}"
+        if node._epoch == 0:
+            model_path = f"{models_dir}/P31_PPO/base"
         model = PPO.load(model_path, env=env)
         node.get_logger().info(f"Base model has been loaded")
 
@@ -90,11 +92,11 @@ def main(args=None):
             reset_num_timesteps=False,
             tb_log_name=algorithm
         )
-        node.get_logger().info(f"Model base_{TIMESTEPS*node._epoch} has been trained")
-        model.save(f"{models_dir}/P31_PPO/base_{TIMESTEPS*node._epoch}")
-        node.get_logger().info(f"Model base_{TIMESTEPS*node._epoch} has been saved")
+        node.get_logger().info(f"Model base_{TIMESTEPS*(node._epoch+1)} has been trained")
+        model.save(f"{models_dir}/P31_PPO/base_{TIMESTEPS*(node._epoch+1)}")
+        node.get_logger().info(f"Model base_{TIMESTEPS*(node._epoch+1)} has been saved")
     except KeyboardInterrupt:
-        model.save(f"{models_dir}/P31_PPO/base_{TIMESTEPS*node._epoch}")
+        model.save(f"{models_dir}/P31_PPO/base_{TIMESTEPS*(node._epoch+1)}")
 
     env.close()
 
