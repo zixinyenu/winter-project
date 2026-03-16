@@ -57,14 +57,6 @@ def main(args=None):
     # Training!
     if node._training_mode == 'train':
         try:
-            # model = TD3(
-            #     policy="MlpPolicy",
-            #     env=env,
-            #     verbose=1,
-            #     tensorboard_log=logs_dir,
-            #     learning_rate=0.001
-            # )
-
             model = PPO(
                 policy="MlpPolicy",
                 env=env,
@@ -74,29 +66,18 @@ def main(args=None):
                 n_steps=2048
             )
 
-            # TIMESTEPS = 1000
-            # for i in range(1, 10001):
-            #     model.learn(
-            #         total_timesteps=TIMESTEPS,
-            #         reset_num_timesteps=False,
-            #         tb_log_name=algorithm
-            #     )
-            #     node.get_logger().info(f"Model {TIMESTEPS*i} has been trained")
-            #     if i % 10 == 0:
-            #         model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
-            #         node.get_logger().info(f"Model {TIMESTEPS*i} has been saved")
-
-            TIMESTEPS = 200000
-            model.learn(
-                total_timesteps=TIMESTEPS,
-                reset_num_timesteps=False,
-                tb_log_name=algorithm
-            )
-            node.get_logger().info(f"Model {TIMESTEPS} has been trained")
-            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS}")
-            node.get_logger().info(f"Model {TIMESTEPS} has been saved")
+            for i in range(1, 26):
+                TIMESTEPS = 10000
+                model.learn(
+                    total_timesteps=TIMESTEPS,
+                    reset_num_timesteps=False,
+                    tb_log_name=algorithm
+                )
+                node.get_logger().info(f"Model {TIMESTEPS*i} has been trained")
+                model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
+                node.get_logger().info(f"Model {TIMESTEPS*i} has been saved")
         except KeyboardInterrupt:
-            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS}")
+            model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
     elif node._training_mode == 'retrain':
         TIMESTEPS = 50000
         model_path = f"{models_dir}/{algorithm}/{TIMESTEPS*node._epoch}.zip"

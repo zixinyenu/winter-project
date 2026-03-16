@@ -36,12 +36,6 @@ class simplified_env(gym.Env, Node):
         self._min_detection_distance = np.float32(0.16)
         self._max_detection_distance = np.float32(8.0) # Not used
 
-        # Action space: 
-        # self.action_space = spaces.Box(
-        #     low=np.array([-self._max_translational_velocity, -self._max_rotational_vel]),
-        #     high=np.array([self._max_translational_velocity, self._max_rotational_vel]),
-        #     dtype=np.float32
-        # )
         self.action_space = spaces.Discrete(4, dtype=np.uint8)
         # Observation space: 
         obs_low = np.append(
@@ -66,9 +60,6 @@ class simplified_env(gym.Env, Node):
         self._timestep_count = 0
         self._episode_count = 0
         self._reward_border = 0.75
-        self._reward_count_1 = 0
-        self._reward_count_2 = 0
-        self._reward_count_3 = 0
         self._success_count = 0
 
         self.laser_observation = np.array([np.float32(9)]*36)
@@ -78,11 +69,6 @@ class simplified_env(gym.Env, Node):
     def step(self, action):
         # Increment step count
         self._timestep_count += 1
-
-        # Publish an aciton, action = [linear_x, angular_z]
-        # linear_x = action[0]
-        # angular_z = action[1]
-        # self.ros_gz_interface.publish_twist([float(linear_x), float(angular_z)])
 
         if action == np.uint8(0):
             self.ros_gz_interface.publish_twist([0.20, 0.0])
@@ -145,9 +131,6 @@ class simplified_env(gym.Env, Node):
         self.done = False
         self.truncated = False
         self._timestep_count = 0
-        self._reward_count_1 = 0
-        self._reward_count_2 = 0
-        self._reward_count_3 = 0
 
         self.laser_observation = np.array([np.float32(9)]*36)
         self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
@@ -163,6 +146,10 @@ class simplified_env(gym.Env, Node):
         while not success:
             result = self.set_entity_pose_cli.call_async(set_pose_request)
             success = True
+        # This might seem to be unnecessary
+        # But there is a delay in the network of the training system
+        # The following line must be added
+        self.ros_gz_interface.turtle_environment._turtle_pos = np.array([np.float32(0), np.float32(0)])
         self.get_logger().info("Turtlebot spawned at (0.0, 0.0), with an orientation of 0.0")
 
         # Reset the goal position
