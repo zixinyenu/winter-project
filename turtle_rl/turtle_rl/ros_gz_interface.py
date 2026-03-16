@@ -40,7 +40,7 @@ class ros_gz_interface:
         self._out_of_bound_grid = False
         self._obstacle_hit_grid = False
         self._obstacle_list = []
-        self._goal_pos = [-5.0, -5.0]
+        self._goal_pos = [1.5, 0.0]
         self.goal_pos_buffer = [-6.0, -6.0]
 
     ########## ROS_Functions_Start ##########
@@ -84,7 +84,7 @@ class ros_gz_interface:
         self._distance, self._bearing = self._get_distance_and_bearing()
         return self._goal_pos
 
-    def reset_goal_position_p22(self):
+    def reset_goal_position_p12(self):
         mag = 1.5*np.cos(np.pi/4.0)
         rand = np.random.random_integers(low=1, high=8)
         if rand <= 5:
@@ -95,6 +95,16 @@ class ros_gz_interface:
             y = -np.sqrt(pow(1.5, 2) - pow(x, 2))
         self._goal_pos[0] = x
         self._goal_pos[1] = y
+        self._distance, self._bearing = self._get_distance_and_bearing()
+        return self._goal_pos
+
+    def reset_goal_position_p13(self):
+        x_mag = np.random.uniform(low=1.1, high=2.9)
+        x_sign = np.random.choice(a=[1.0, -1.0], replace=True)
+        y_mag = np.random.uniform(low=1.1, high=2.9)
+        y_sign = np.random.choice(a=[1.0, -1.0], replace=True)
+        self._goal_pos[0] = x_mag*x_sign
+        self._goal_pos[1] = y_mag*y_sign
         self._distance, self._bearing = self._get_distance_and_bearing()
         return self._goal_pos
 
