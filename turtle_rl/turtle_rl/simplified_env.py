@@ -112,7 +112,7 @@ class simplified_env(gym.Env, Node):
 
         # Check if the episode needs to be truncated
         flag_2 = False
-        if self._timestep_count == 100:
+        if self._timestep_count == 150:
             flag_2 = True
         self.truncated = flag_2
         truncated = self.truncated
@@ -152,9 +152,9 @@ class simplified_env(gym.Env, Node):
 
         # Reset the goal position
         # Skip for the first reset in each map configuration
-        # if self._episode_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
-        #     new_goal_pos = self.ros_gz_interface.reset_goal_position()
-        #     self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
+        if self._episode_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
+            new_goal_pos = self.ros_gz_interface.reset_goal_position_p22()
+            self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
         self._episode_count += 1
 
         # Spin once to get initial observation and info
@@ -194,7 +194,7 @@ class simplified_env(gym.Env, Node):
         # After initialization, self.location_observation[0] will be very close to 0 briefly
         if self.location_observation[0] < self._tolerence \
             and self.location_observation[0] > 0.01:
-            self.reward += 1000
+            self.reward += 300
             self.get_logger().info(f"The turtlebot is within {self._tolerence} from the goal!")
 
         if self.location_observation[0] > 0.01:
@@ -204,7 +204,7 @@ class simplified_env(gym.Env, Node):
         #     self.reward += -0.01
         #     # self.get_logger().info("Apply out-of-bound penalty (constant).")
         if self.ros_gz_interface.obstacle_hit_penalty_grid():
-            self.reward += -10.0
+            self.reward += -15.0
             # self.get_logger().info("Apply obstacle-hit penalty. (constant)")
 
         return self.reward

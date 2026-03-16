@@ -79,13 +79,13 @@ def main(args=None):
         except KeyboardInterrupt:
             model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
     elif node._training_mode == 'retrain':
-        model_path = f"{models_dir}/P21_PPO/base.zip"
+        model_path = f"{models_dir}/P22_PPO/base.zip"
         model = PPO.load(model_path, env=env)
         node.get_logger().info(f"Base model has been loaded")
 
     try:
         TIMESTEPS = 10000
-        for i in range(1, 21):
+        for i in range(1, 36):
             model.learn(
                 total_timesteps=TIMESTEPS,
                 reset_num_timesteps=False,

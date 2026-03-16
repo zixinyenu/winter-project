@@ -1,0 +1,49 @@
+<sdf version='1.12'>
+  <model name='square_2'>
+    <plugin filename="gz-sim-touchplugin-system"            name="gz::sim::systems::TouchPlugin">        <target>turtlebot3_burger</target>        <namespace>obstacle</namespace>        <time>0.001</time>        <enabled>true</enabled>    </plugin>    <pose>0.0 0.75 0.5 0.0 0.0 0.0</pose>
+    <link name='box_link'>
+      <sensor name='sensor_contact' type='contact'>          <contact>              <collision>box_collision</collision>          </contact>      </sensor>      <inertial>
+        <inertia>
+          <ixx>10.625</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>10.625</iyy>
+          <iyz>0</iyz>
+          <izz>1.25</izz>
+        </inertia>
+        <mass>120</mass>
+        <pose>0 0 0 0 0 0</pose>
+      </inertial>
+      <collision name='box_collision'>
+        <geometry>
+          <box>
+            <size>0.25 0.25 1.0</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode/>
+          </friction>
+          <bounce/>
+          <contact/>
+        </surface>
+      </collision>
+      <visual name='box_visual'>
+        <geometry>
+          <box>
+            <size>0.25 0.25 1.0</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+          <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+          <specular>1 1 1 1</specular>
+        </material>
+      </visual>
+      <pose>0 0 0 0 0 0</pose>
+      <enable_wind>false</enable_wind>
+    </link>
+    <static>false</static>
+    <self_collide>false</self_collide>
+  </model>
+</sdf>

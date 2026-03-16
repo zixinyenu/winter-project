@@ -176,6 +176,158 @@ def gen_cylinder_apt(map_length, map_width, d, mean_radius, noise):
 
     return x, y, radius, pending_list, success
 
+def gen_square_atp_p22(
+        map_length,
+        map_width,
+        d,
+        square_x,
+        square_y,
+        square_ori,
+        square_side,
+        rotate=False):
+    if not rotate:
+        rad = 0.0
+    else:
+        rad = square_ori
+
+    x = square_x
+    y = square_y
+    side = square_side
+    side = abs(side)
+
+    pending_list = []
+    success = True
+
+    ystart = y-side/2
+    xstart = x-side/2
+    ystop = (y+side/2)+(1/d)
+    xstop = (x+side/2)+(1/d)
+
+    if not rotate:
+        if ystart < -map_width/2 or xstart < -map_length/2 or \
+            ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
+            success = False
+            return 4, 4, 6.28, -1, [], success
+
+        for yp in np.arange(start=ystart, stop=ystop, step=1/d):
+            for xp in np.arange(start=xstart, stop=xstop, step=1/d):
+                i, j = xy2ij(xp, yp, -map_length/2, -map_width/2, d)
+                pending_list.append([i, j])
+    else:
+        ne = rot2d(x, y, xstop, ystop, rad)
+        nw = rot2d(x, y, xstart, ystop, rad)
+        sw = rot2d(x, y, xstart, ystart, rad)
+        se = rot2d(x, y, xstop, ystart, rad)
+
+        if abs(ne[0]) > map_length/2 or abs(ne[1]) > map_width/2 or \
+            abs(nw[0]) > map_length/2 or abs(nw[1]) > map_width/2 or \
+            abs(sw[0]) > map_length/2 or abs(sw[1]) > map_width/2 or \
+            abs(se[0]) > map_length/2 or abs(se[1]) > map_width/2:
+            success = False
+            return 4, 4, 6.28, -1, [], success
+
+        for yp in np.arange(start=ystart, stop=ystop, step=1/d):
+            for xp in np.arange(start=xstart, stop=xstop, step=1/d):
+                rot_point = rot2d(x, y, xp, yp, rad)
+                i, j = xy2ij(rot_point[0], rot_point[1], -map_length/2, -map_width/2, d)
+                pending_list.append([i, j])
+
+    return x, y, rad, side, pending_list, success
+
+def gen_rectangle_atp_p22(
+        map_length,
+        map_width,
+        d,
+        rectangle_x,
+        rectangle_y,
+        rectangle_ori,
+        rectangle_len,
+        rectangle_wdt,
+        rotate=False):
+    if not rotate:
+        rad = 0.0
+    else:
+        rad = rectangle_ori
+
+    x = rectangle_x
+    y = rectangle_y
+    length = rectangle_len
+    width = rectangle_wdt
+    length = abs(length)
+    width = abs(width)
+
+    pending_list = []
+    success = True
+
+    ystart = y-width/2
+    xstart = x-length/2
+    ystop = (y+width/2)+(1/d)
+    xstop = (x+length/2)+(1/d)
+
+    if not rotate:
+        if ystart < -map_width/2 or xstart < -map_length/2 or \
+            ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
+            success = False
+            return 4, 4, 6.28, -1, -1, [], success
+
+        for yp in np.arange(start=ystart, stop=ystop, step=1/d):
+            for xp in np.arange(start=xstart, stop=xstop, step=1/d):
+                i, j = xy2ij(xp, yp, -map_length/2, -map_width/2, d)
+                pending_list.append([i, j])
+    else:
+        ne = rot2d(x, y, xstop, ystop, rad)
+        nw = rot2d(x, y, xstart, ystop, rad)
+        sw = rot2d(x, y, xstart, ystart, rad)
+        se = rot2d(x, y, xstop, ystart, rad)
+
+        if abs(ne[0]) > map_length/2 or abs(ne[1]) > map_width/2 or \
+            abs(nw[0]) > map_length/2 or abs(nw[1]) > map_width/2 or \
+            abs(sw[0]) > map_length/2 or abs(sw[1]) > map_width/2 or \
+            abs(se[0]) > map_length/2 or abs(se[1]) > map_width/2:
+            success = False
+            return 4, 4, 6.28, -1, -1, [], success
+
+        for yp in np.arange(start=ystart, stop=ystop, step=1/d):
+            for xp in np.arange(start=xstart, stop=xstop, step=1/d):
+                rot_point = rot2d(x, y, xp, yp, rad)
+                i, j = xy2ij(rot_point[0], rot_point[1], -map_length/2, -map_width/2, d)
+                pending_list.append([i, j])
+
+    return x, y, rad, length, width, pending_list, success
+
+def gen_cylinder_apt_p22(
+        map_length,
+        map_width,
+        d,
+        cylinder_x,
+        cylinder_y,
+        cylinder_radius):
+    x = cylinder_x
+    y = cylinder_y
+    radius = cylinder_radius
+    radius = abs(radius)
+
+    pending_list = []
+    success = True
+
+    ystart = y-radius
+    xstart = x-radius
+    ystop = (y+radius)+(1/d)
+    xstop = (x+radius)+(1/d)
+
+    if ystart < -map_width/2 or xstart < -map_length/2 or \
+        ystop > map_width/2 + 1/d or xstop > map_length/2 + 1/d:
+        success = False
+        return 4, 4, -1, [], success
+    for yp in np.arange(start=ystart, stop=ystop, step=1/d):
+        for xp in np.arange(start=xstart, stop=xstop, step=1/d):
+            if (yp - y)**2 + (xp-x)**2 > radius**2:
+                continue
+            i, j = xy2ij(xp, yp, -map_length/2, -map_width/2, d)
+            pending_list.append([i, j])
+
+    return x, y, radius, pending_list, success
+
 def check_collision(obstacle_list, pending_list):
     for pixel in pending_list:
         [i, j] = pixel
@@ -246,6 +398,70 @@ def create_one_obstacle_map(
         for j in range(int((i_max-1)/2 + 0.75*divison + 1),
                     int((i_max-1)/2 + 1.00*divison + 1)):
             obstacle_list[i][j] = np.uint8(1)
+    turtle_goal = [goal_x, goal_y]
+    return obstacle_list, turtle_goal
+
+def create_eight_obstacle_map(
+    map_length = 6,
+    map_width = 6,
+    divison = 100,
+    goal_x = 1.5,
+    goal_y = 0.0
+):
+    i_max = int(map_width*divison + 1)
+    j_max = int(map_length*divison + 1)
+    obstacle_list = np.zeros(shape=(i_max, j_max), dtype=np.uint8)
+    square_list = []
+    rectangle_list = []
+    cylinder_list = []
+
+    # 12 o'clock
+    x, y, rad, side, pending_list, success = gen_square_atp_p22(map_length, map_width, divison, 0.75, 0.0, 0.0, 0.3, True)
+    check_collision(obstacle_list, pending_list)
+    square_list.append([x, y, rad, side])
+    # 1.5 o'clock
+    x, y, rad, length, width, pending_list, success = gen_rectangle_atp_p22(map_length, map_width, divison, 0.75, -0.75, 0.78, 0.45, 0.05, True)
+    check_collision(obstacle_list, pending_list)
+    rectangle_list.append([x, y, rad, length, width])
+    # 3 o'clock
+    x, y, radius, pending_list, success = gen_cylinder_apt_p22(map_length, map_width, divison, 0.0, -0.9, 0.15)
+    check_collision(obstacle_list, pending_list)
+    cylinder_list.append([x, y, radius])
+    # 4.5 o'clock
+    x, y, rad, side, pending_list, success = gen_square_atp_p22(map_length, map_width, divison, -0.5, -0.5, 0.78, 0.2, True)
+    check_collision(obstacle_list, pending_list)
+    square_list.append([x, y, rad, side])
+    # 6 o'clock
+    x, y, rad, length, width, pending_list, success = gen_rectangle_atp_p22(map_length, map_width, divison, -1.1, 0.0, 1.57, 0.55, 0.05, True)
+    check_collision(obstacle_list, pending_list)
+    rectangle_list.append([x, y, rad, length, width])
+    # 7.5 o'clock
+    x, y, radius, pending_list, success = gen_cylinder_apt_p22(map_length, map_width, divison, -0.7, 0.7, 0.1)
+    check_collision(obstacle_list, pending_list)
+    cylinder_list.append([x, y, radius])
+    # 9 o'clock
+    x, y, rad, side, pending_list, success = gen_square_atp_p22(map_length, map_width, divison, 0.0, 0.75, 0.0, 0.25, True)
+    check_collision(obstacle_list, pending_list)
+    square_list.append([x, y, rad, side])
+    # 10.5 o'clock
+    x, y, rad, length, width, pending_list, success = gen_rectangle_atp_p22(map_length, map_width, divison, 0.80, 0.80, -0.78, 0.65, 0.05, True)
+    check_collision(obstacle_list, pending_list)
+    rectangle_list.append([x, y, rad, length, width])
+
+    # dir_path = "/home/zixin/ws/winter_project/src/turtle_rl/worlds/P22_obstacles"
+    # square_count = 0
+    # for square in square_list:
+    #     create_squares(square, square_count, dir_path)
+    #     square_count += 1
+    # rectangle_count = 0
+    # for rectangle in rectangle_list:
+    #     create_rectangles(rectangle, rectangle_count, dir_path)
+    #     rectangle_count += 1
+    # cylinder_count = 0
+    # for cylinder in cylinder_list:
+    #     create_cylinders(cylinder, cylinder_count, dir_path)
+    #     cylinder_count += 1
+    
     turtle_goal = [goal_x, goal_y]
     return obstacle_list, turtle_goal
         
@@ -718,3 +934,5 @@ def create_cylinders(cylinder_param, cylinder_id, world_dir):
 # plt.ylim([-3, 3])
 # plt.legend(loc="upper right")
 # plt.show()
+
+# create_eight_obstacle_map()
