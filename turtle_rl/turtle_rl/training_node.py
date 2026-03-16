@@ -85,7 +85,7 @@ def main(args=None):
 
     try:
         TIMESTEPS = 10000
-        for i in range(1, 36):
+        for i in range(1, 21):
             model.learn(
                 total_timesteps=TIMESTEPS,
                 reset_num_timesteps=False,
