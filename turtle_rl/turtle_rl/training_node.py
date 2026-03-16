@@ -79,27 +79,26 @@ def main(args=None):
         except KeyboardInterrupt:
             model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*i}")
     elif node._training_mode == 'retrain':
-        model_path = f"{models_dir}/P22_PPO/base.zip"
+        TIMESTEPS = 1000
+        model_path = f"{models_dir}/P31_PPO/base_{TIMESTEPS*node._epoch}"
         model = PPO.load(model_path, env=env)
         node.get_logger().info(f"Base model has been loaded")
 
     try:
-        TIMESTEPS = 10000
-        for i in range(1, 21):
-            model.learn(
-                total_timesteps=TIMESTEPS,
-                reset_num_timesteps=False,
-                tb_log_name=algorithm
-            )
-            node.get_logger().info(f"Model base_{TIMESTEPS*i} has been trained")
-            model.save(f"{models_dir}/{algorithm}/base_{TIMESTEPS*i}")
-            node.get_logger().info(f"Model base_{TIMESTEPS*i} has been saved")
+        model.learn(
+            total_timesteps=TIMESTEPS,
+            reset_num_timesteps=False,
+            tb_log_name=algorithm
+        )
+        node.get_logger().info(f"Model base_{TIMESTEPS*node._epoch} has been trained")
+        model.save(f"{models_dir}/P31_PPO/base_{TIMESTEPS*node._epoch}")
+        node.get_logger().info(f"Model base_{TIMESTEPS*node._epoch} has been saved")
     except KeyboardInterrupt:
-        model.save(f"{models_dir}/{algorithm}/base_{TIMESTEPS*i}")
+        model.save(f"{models_dir}/P31_PPO/base_{TIMESTEPS*node._epoch}")
 
     env.close()
 
-    node.get_logger().info("This episode of training has finished.")
+    node.get_logger().info("Training based on this map configuration has finished.")
     node.destroy_node()
     rclpy.shutdown()
 

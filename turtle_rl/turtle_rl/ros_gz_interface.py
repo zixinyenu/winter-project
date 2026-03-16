@@ -70,15 +70,22 @@ class ros_gz_interface:
     def interface_destroy(self):
         self.turtle_environment.turtle_env_destroy()
 
-    # Genius design
-    def reset_goal_position(self):
-        # has_collision = True
-        # while has_collision:
-        #     x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
-        #     has_collision = check_turtle_collision(self._obstacle_list, pending_list)
-        x = np.random.uniform(low=-1.5, high=1.5)
-        max_y_abs = np.sqrt(2.25 - pow(x, 2))
-        y = np.random.uniform(low=-max_y_abs, high=max_y_abs)
+    def reset_start_position_p31(self):
+        has_collision = True
+        while has_collision:
+            x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
+            has_collision = check_turtle_collision(self._obstacle_list, pending_list)
+        return x, y, rad
+
+    def reset_goal_position_p31(self, start_x, start_y):
+        has_collision = True
+        within_2point5 = True
+        while has_collision or within_2point5:
+            x, y, rad, radius, pending_list, success = gen_turtle_apt(map_length=6, map_width=6, d=100, collision_radius=0.11)
+            has_collision = check_turtle_collision(self._obstacle_list, pending_list)
+
+            if pow(x - start_x, 2) + pow(y - start_y, 2) >= pow(2.5, 2):
+                within_2point5 = False
         self._goal_pos[0] = x
         self._goal_pos[1] = y
         self._distance, self._bearing = self._get_distance_and_bearing()

@@ -471,7 +471,7 @@ def create_map(
         divison = 100,
         collision_radius=0.11,
         randomness = 1,
-        border = 1.5
+        border = 2.5
 ):
     i_max = int(map_width*divison + 1)
     j_max = int(map_length*divison + 1)
@@ -654,7 +654,7 @@ def create_map(
         else:
             start_x = turtle_param[0]
             start_y = turtle_param[1]
-            if ((x - start_x)**2 + (y - start_y)**2)**0.5 <= border:
+            if ((x - start_x)**2 + (y - start_y)**2)**0.5 < border:
                 continue
             else:
                 turtle_goal[0] = x

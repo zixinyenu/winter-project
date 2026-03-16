@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
+from tf_transformations import quaternion_from_euler
 from std_srvs.srv import Empty
 from ros_gz_interfaces.srv import ControlWorld, SetEntityPose, SpawnEntity, DeleteEntity
 from turtle_interfaces.srv import SetUpNewEpisode
@@ -84,7 +85,7 @@ class gazebo_env:
 
         # Non-ROS variables
         self._simulation_paused = False
-        self._worlds_path = "/home/zixin/ws/winter_project/src/turtle_rl/worlds"
+        self._worlds_path = "/home/zixin/ws/winter_project/src/turtle_rl/worlds/P31_obstacles"
         self._square_count = 0
         self._rectangle_count = 0
         self._cylinder_count = 0
@@ -126,7 +127,11 @@ class gazebo_env:
         set_pose_request.pose.position.x = start_pos[0]
         set_pose_request.pose.position.y = start_pos[1]
         set_pose_request.pose.position.z = 0.0
-        set_pose_request.pose.orientation.z = start_pos[2]
+        x, y, z, w = quaternion_from_euler(0.0, 0.0, start_pos[2])
+        set_pose_request.pose.orientation.x = x
+        set_pose_request.pose.orientation.y = y
+        set_pose_request.pose.orientation.z = z
+        set_pose_request.pose.orientation.w = w
         result = await self.set_entity_pose_cli.call_async(set_pose_request)
         self.node.get_logger().info(f"Initial turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
 
@@ -138,7 +143,11 @@ class gazebo_env:
             spawn_request.entity_factory.pose.position.x = square[0]
             spawn_request.entity_factory.pose.position.y = square[1]
             spawn_request.entity_factory.pose.position.z = 0.5
-            spawn_request.entity_factory.pose.orientation.z = square[2]
+            x, y, z, w = quaternion_from_euler(0.0, 0.0, square[2])
+            spawn_request.entity_factory.pose.orientation.x = x
+            spawn_request.entity_factory.pose.orientation.y = y
+            spawn_request.entity_factory.pose.orientation.z = z
+            spawn_request.entity_factory.pose.orientation.w = w
             result = await self.spawn_entity_cli.call_async(spawn_request)
             square_count += 1
         self.node.get_logger().info("Squares all created successfully.")
@@ -152,7 +161,11 @@ class gazebo_env:
             spawn_request.entity_factory.pose.position.x = rectangle[0]
             spawn_request.entity_factory.pose.position.y = rectangle[1]
             spawn_request.entity_factory.pose.position.z = 0.5
-            spawn_request.entity_factory.pose.orientation.z = rectangle[2]
+            x, y, z, w = quaternion_from_euler(0.0, 0.0, rectangle[2])
+            spawn_request.entity_factory.pose.orientation.x = x
+            spawn_request.entity_factory.pose.orientation.y = y
+            spawn_request.entity_factory.pose.orientation.z = z
+            spawn_request.entity_factory.pose.orientation.w = w
             result = await self.spawn_entity_cli.call_async(spawn_request)
             rectangle_count += 1
         self.node.get_logger().info("Rectangles all created successfully.")
@@ -190,7 +203,6 @@ class gazebo_env:
         set_pose_request.pose.position.x = start_pos[0]
         set_pose_request.pose.position.y = start_pos[1]
         set_pose_request.pose.position.z = 0.0
-        set_pose_request.pose.orientation.z = start_pos[2]
         result = await self.set_entity_pose_cli.call_async(set_pose_request)
         self.node.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
 
@@ -212,7 +224,6 @@ class gazebo_env:
         set_pose_request.pose.position.x = start_pos[0]
         set_pose_request.pose.position.y = start_pos[1]
         set_pose_request.pose.position.z = 0.0
-        set_pose_request.pose.orientation.z = start_pos[2]
         result = await self.set_entity_pose_cli.call_async(set_pose_request)
         self.node.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
 
@@ -234,7 +245,6 @@ class gazebo_env:
         set_pose_request.pose.position.x = start_pos[0]
         set_pose_request.pose.position.y = start_pos[1]
         set_pose_request.pose.position.z = 0.0
-        set_pose_request.pose.orientation.z = start_pos[2]
         result = await self.set_entity_pose_cli.call_async(set_pose_request)
         self.node.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
 
