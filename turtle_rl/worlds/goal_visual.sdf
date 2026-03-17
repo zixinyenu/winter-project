@@ -1,0 +1,51 @@
+<sdf version='1.12'>
+    <model name='goal_visual'>
+        <pose>3.5 0.0 0.5 0.0 0.0 0.0</pose>
+        <link name='cylinder_link'>
+        <inertial>
+            <inertia>
+            <ixx>10.674999999999999</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10.674999999999999</iyy>
+            <iyz>0</iyz>
+            <izz>1.3499999999999999</izz>
+            </inertia>
+            <mass>120</mass>
+            <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='cylinder_collision'>
+            <geometry>
+            <cylinder>
+                <radius>0.001</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <surface>
+            <friction>
+                <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+            </surface>
+        </collision>
+        <visual name='cylinder_visual'>
+            <geometry>
+            <cylinder>
+                <radius>0.25</radius>
+                <length>1.0</length>
+            </cylinder>
+            </geometry>
+            <material>
+            <ambient>1 0 0 1</ambient>
+            <diffuse>1 0 0 1</diffuse>
+            <specular>1 0 0 1</specular>
+            </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+        </link>
+        <static>false</static>
+        <self_collide>false</self_collide>
+    </model>
+</sdf>

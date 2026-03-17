@@ -17,7 +17,7 @@ class simplified_env(gym.Env, Node):
         self.ros_gz_interface = ros_gz_interface(self)
 
         # Gazebo factor
-        self.declare_parameter("real_time_factor", 10.0)
+        self.declare_parameter("real_time_factor", 7.0)
         self._real_time_factor = self.get_parameter("real_time_factor").value
 
         # Callback Group
@@ -156,15 +156,15 @@ class simplified_env(gym.Env, Node):
             # Reset the goal position
             # Skip for the first reset in each map configuration
             new_goal_pos = self.ros_gz_interface.reset_goal_position_p31(new_start_x, new_start_y)
-            set_pose_request_2 = SetEntityPose.Request()
-            set_pose_request_2.entity.name = "goal_visual"
-            set_pose_request_2.pose.position.x = new_goal_pos[0]
-            set_pose_request_2.pose.position.y = new_goal_pos[1]
-            set_pose_request_2.pose.position.z = 0.0
-            success = False
-            while not success:
-                result = self.set_entity_pose_cli.call_async(set_pose_request_2)
-                success = True
+            # set_pose_request_2 = SetEntityPose.Request()
+            # set_pose_request_2.entity.name = "goal_visual"
+            # set_pose_request_2.pose.position.x = new_goal_pos[0]
+            # set_pose_request_2.pose.position.y = new_goal_pos[1]
+            # set_pose_request_2.pose.position.z = 0.0
+            # success = False
+            # while not success:
+            #     result = self.set_entity_pose_cli.call_async(set_pose_request_2)
+            #     success = True
             self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
         self._episode_count += 1
 
@@ -205,7 +205,7 @@ class simplified_env(gym.Env, Node):
         # After initialization, self.location_observation[0] will be very close to 0 briefly
         if self.location_observation[0] < self._tolerence \
             and self.location_observation[0] > 0.01:
-            self.reward += 300
+            self.reward += 1000
             self.get_logger().info(f"The turtlebot is within {self._tolerence} from the goal!")
 
         if self.location_observation[0] > 0.01:
