@@ -2,7 +2,7 @@ import rclpy
 import gymnasium as gym
 from rclpy.node import Node
 from gymnasium.envs import registration
-from stable_baselines3 import PPO, TD3
+from stable_baselines3 import PPO, A2C
 from stable_baselines3.common import env_checker
 from stable_baselines3.common import callbacks
 from stable_baselines3.common.monitor import Monitor
@@ -31,7 +31,7 @@ def main(args=None):
     node = training_node()
 
     # Create directories where the trained RL models and logswill be saved
-    algorithm = "PPO"
+    algorithm = "A2C"
     models_dir = f"/home/zixin/ws/winter_project/src/turtle_rl/models"
     logs_dir = f"/home/zixin/ws/winter_project/src/turtle_rl/logs"
 
@@ -57,13 +57,11 @@ def main(args=None):
     # Training!
     if node._training_mode == 'train':
         try:
-            model = PPO(
+            model = A2C(
                 policy="MlpPolicy",
                 env=env,
                 verbose=1,
-                tensorboard_log=logs_dir,
-                learning_rate=0.0003,
-                n_steps=2048
+                tensorboard_log=logs_dir
             )
 
             for i in range(1, 26):
@@ -81,7 +79,7 @@ def main(args=None):
     elif node._training_mode == 'retrain':
         TIMESTEPS = 50000
         model_path = f"{models_dir}/{algorithm}/{TIMESTEPS*node._epoch}.zip"
-        model = PPO.load(model_path, env=env)
+        model = A2C.load(model_path, env=env)
         node.get_logger().info(f"Model {TIMESTEPS*(node._epoch)} has been loaded")
 
         try:
