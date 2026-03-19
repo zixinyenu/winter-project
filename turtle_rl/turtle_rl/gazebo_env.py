@@ -134,12 +134,12 @@ class gazebo_env:
         result = await self.set_entity_pose_cli.call_async(set_pose_request_1)
         self.node.get_logger().info(f"Initial turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
 
-        # set_pose_request_2 = SetEntityPose.Request()
-        # set_pose_request_2.entity.name = "goal_visual"
-        # set_pose_request_2.pose.position.x = goal_pos[0]
-        # set_pose_request_2.pose.position.y = goal_pos[1]
-        # set_pose_request_2.pose.position.z = 0.5
-        # result = await self.set_entity_pose_cli.call_async(set_pose_request_2)
+        set_pose_request_2 = SetEntityPose.Request()
+        set_pose_request_2.entity.name = "goal_visual"
+        set_pose_request_2.pose.position.x = goal_pos[0]
+        set_pose_request_2.pose.position.y = goal_pos[1]
+        set_pose_request_2.pose.position.z = 0.5
+        result = await self.set_entity_pose_cli.call_async(set_pose_request_2)
         self.node.get_logger().info(f"Initial goal at ({goal_pos[0]}, {goal_pos[1]})\n")
 
         square_count = 0
