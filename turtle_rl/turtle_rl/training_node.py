@@ -83,19 +83,33 @@ def main(args=None):
         model = PPO.load(model_path, env=env)
         node.get_logger().info(f"Base model has been loaded")
 
-    try:
+        try:
+            TIMESTEPS = 10000
+            for i in range(1, 21):
+                model.learn(
+                    total_timesteps=TIMESTEPS,
+                    reset_num_timesteps=False,
+                    tb_log_name=algorithm
+                )
+                node.get_logger().info(f"Model base_{TIMESTEPS*i} has been trained")
+                model.save(f"{models_dir}/{algorithm}/base_{TIMESTEPS*i}")
+                node.get_logger().info(f"Model base_{TIMESTEPS*i} has been saved")
+        except KeyboardInterrupt:
+            model.save(f"{models_dir}/{algorithm}/base_{TIMESTEPS*i}")
+    elif node._training_mode == 'display':
         TIMESTEPS = 10000
-        for i in range(1, 21):
+        model_path = f"{models_dir}/display/base_200000"
+        model = PPO.load(model_path, env=env)
+        node.get_logger().info(f"Display model has been loaded")
+
+        try:
             model.learn(
                 total_timesteps=TIMESTEPS,
                 reset_num_timesteps=False,
-                tb_log_name=algorithm
+                tb_log_name="/home/zixin/Desktop/trash"
             )
-            node.get_logger().info(f"Model base_{TIMESTEPS*i} has been trained")
-            model.save(f"{models_dir}/{algorithm}/base_{TIMESTEPS*i}")
-            node.get_logger().info(f"Model base_{TIMESTEPS*i} has been saved")
-    except KeyboardInterrupt:
-        model.save(f"{models_dir}/{algorithm}/base_{TIMESTEPS*i}")
+        except KeyboardInterrupt:
+            pass
 
     env.close()
 
