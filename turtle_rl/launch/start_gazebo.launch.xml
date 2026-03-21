@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="world" default="$(find-pkg-share turtle_rl)/worlds/obstacle_free.world.sdf" description="World sdf file path." />
+    <arg name="world" default="$(find-pkg-share turtle_rl)/worlds/turtle.world.sdf" description="World sdf file path." />
     <arg name="world_name" default="empty" description="Name of the world." />
     <arg name="gz_gui_config" default="$(find-pkg-share turtle_rl)/gazebo_gui.config" description="Gazebo GUI configuration." />
     <arg name="view_only" default="false" description="True to view Rviz, default as false" />

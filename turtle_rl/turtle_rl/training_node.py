@@ -96,6 +96,20 @@ def main(args=None):
             node.get_logger().info(f"Model {TIMESTEPS*(node._epoch+1)} has been saved")
         except KeyboardInterrupt:
             model.save(f"{models_dir}/{algorithm}/{TIMESTEPS*(node._epoch+1)}")
+    elif node._training_mode == 'display':
+        TIMESTEPS = 10000
+        model_path = f"{models_dir}/display/500000"
+        model = PPO.load(model_path, env=env)
+        node.get_logger().info(f"Display model has been loaded")
+
+        try:
+            model.learn(
+                total_timesteps=TIMESTEPS,
+                reset_num_timesteps=False,
+                tb_log_name="/home/zixin/Desktop/trash"
+            )
+        except KeyboardInterrupt:
+            pass
 
     env.close()
 
