@@ -229,14 +229,21 @@ class gazebo_env:
         self.node.get_logger().info(f"Goal position set at ({goal_pos[0]}, {goal_pos[1]})")
 
         start_pos = [0.0, 0.0, 0.0]
-        set_pose_request = SetEntityPose.Request()
-        set_pose_request.entity.name = "turtlebot3_burger"
-        set_pose_request.pose.position.x = start_pos[0]
-        set_pose_request.pose.position.y = start_pos[1]
-        set_pose_request.pose.position.z = 0.0
-        set_pose_request.pose.orientation.z = start_pos[2]
-        result = await self.set_entity_pose_cli.call_async(set_pose_request)
+        set_pose_request_1 = SetEntityPose.Request()
+        set_pose_request_1.entity.name = "turtlebot3_burger"
+        set_pose_request_1.pose.position.x = start_pos[0]
+        set_pose_request_1.pose.position.y = start_pos[1]
+        set_pose_request_1.pose.position.z = 0.0
+        set_pose_request_1.pose.orientation.z = start_pos[2]
+        result = await self.set_entity_pose_cli.call_async(set_pose_request_1)
         self.node.get_logger().info(f"Turtlebot spawned at ({start_pos[0]}, {start_pos[1]}), with an orientation of {start_pos[2]}")
+
+        set_pose_request_2 = SetEntityPose.Request()
+        set_pose_request_2.entity.name = "goal_visual"
+        set_pose_request_2.pose.position.x = goal_pos[0]
+        set_pose_request_2.pose.position.y = goal_pos[1]
+        set_pose_request_2.pose.position.z = 0.5
+        result = await self.set_entity_pose_cli.call_async(set_pose_request_2)
 
         return response
 

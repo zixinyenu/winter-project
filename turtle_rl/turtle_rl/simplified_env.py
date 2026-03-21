@@ -134,15 +134,15 @@ class simplified_env(gym.Env, Node):
         self.location_observation = np.array([np.float32(8.4853), np.float32(np.pi)])
         self.observation = np.append(self.laser_observation, self.location_observation)
 
-        set_pose_request = SetEntityPose.Request()
-        set_pose_request.entity.name = "turtlebot3_burger"
-        set_pose_request.pose.position.x = 0.0
-        set_pose_request.pose.position.y = 0.0
-        set_pose_request.pose.position.z = 0.0
-        set_pose_request.pose.orientation.z = 0.0
+        set_pose_request_1 = SetEntityPose.Request()
+        set_pose_request_1.entity.name = "turtlebot3_burger"
+        set_pose_request_1.pose.position.x = 0.0
+        set_pose_request_1.pose.position.y = 0.0
+        set_pose_request_1.pose.position.z = 0.0
+        set_pose_request_1.pose.orientation.z = 0.0
         success = False
         while not success:
-            result = self.set_entity_pose_cli.call_async(set_pose_request)
+            result = self.set_entity_pose_cli.call_async(set_pose_request_1)
             success = True
         # This might seem to be unnecessary
         # But there is a delay in the network of the training system
@@ -154,6 +154,15 @@ class simplified_env(gym.Env, Node):
         # Skip for the first reset in each map configuration
         if self._episode_count != 0 and self.ros_gz_interface.obstacle_list_is_initialized():
             new_goal_pos = self.ros_gz_interface.reset_goal_position_p22()
+            set_pose_request_2 = SetEntityPose.Request()
+            set_pose_request_2.entity.name = "goal_visual"
+            set_pose_request_2.pose.position.x = new_goal_pos[0]
+            set_pose_request_2.pose.position.y = new_goal_pos[1]
+            set_pose_request_2.pose.position.z = 0.0
+            success = False
+            while not success:
+                result = self.set_entity_pose_cli.call_async(set_pose_request_2)
+                success = True
             self.get_logger().info(f"New goal position: ({new_goal_pos[0]}, {new_goal_pos[1]})")
         self._episode_count += 1
 
